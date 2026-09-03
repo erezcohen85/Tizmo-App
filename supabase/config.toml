@@ -1,0 +1,7 @@
+project_id = "oqniapydqixdcwpzurgs"
+
+[functions.share-history]
+verify_jwt = false
+
+[functions.manage-share-link]
+verify_jwt = false
