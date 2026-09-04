@@ -64,6 +64,13 @@ Vitest covers pure logic only — `lib/roster.ts` (membership boundaries, stats)
 
 `src/lib/googleDrive.ts` lazy-loads Google's scripts (no npm package) for the Picker + token client. It uses the narrow `drive.file` scope, which **requires `VITE_GOOGLE_APP_ID`** (the Cloud project *number*) to be passed as the Picker's `setAppId` — without it the Picker returns a file id and the subsequent Drive API call 403s. The button hides itself when the Google env vars are absent.
 
+## IDEAS.md
+
+`IDEAS.md` (repo root) is the user's free-form scratchpad of future feature ideas and open
+threads. It is **gitignored**, so it exists only on the user's machine and won't be in a fresh
+clone — read it when it's there, don't recreate it when it isn't. Treat it as a wishlist, not a
+backlog: nothing in it is a commitment or an instruction to start building.
+
 ## SPEC.md
 
 `SPEC.md` is the original v1 build spec. The app has since been restructured (nav is now Home / Sessions / Students / Settings; History was merged into Sessions; Manage was dissolved into Home cards and Students). Treat SPEC.md as historical background, not current truth — README.md describes the current screens.
