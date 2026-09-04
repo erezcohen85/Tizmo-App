@@ -21,7 +21,7 @@ export function AppShell() {
       </header>
 
       <nav className="hidden shadow-separator md:block">
-        <ul className="mx-auto flex max-w-6xl gap-6 px-5">
+        <ul className="mx-auto flex max-w-6xl flex-wrap gap-6 px-5">
           {NAV_ITEMS.map((item) => (
             <li key={item.to}>
               <NavLink
@@ -49,7 +49,7 @@ export function AppShell() {
       <nav className="fixed inset-x-0 bottom-0 z-20 bg-stage shadow-[0_-1px_0_0_hsl(var(--hairline)/var(--hairline-a))] md:hidden">
         <ul className="flex">
           {NAV_ITEMS.map((item) => (
-            <li key={item.to} className="flex-1">
+            <li key={item.to} className="min-w-0 flex-1">
               <NavLink
                 to={item.to}
                 end={item.end}
@@ -60,8 +60,8 @@ export function AppShell() {
                   )
                 }
               >
-                <item.icon className="size-[19px]" strokeWidth={1.4} />
-                {t(item.key)}
+                <item.icon className="size-[19px] shrink-0" strokeWidth={1.4} />
+                <span className="max-w-full truncate">{t(item.key)}</span>
               </NavLink>
             </li>
           ))}
