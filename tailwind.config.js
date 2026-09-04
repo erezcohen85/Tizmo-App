@@ -4,6 +4,10 @@ export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
+      fontFamily: {
+        ui: ['Assistant', 'system-ui', 'sans-serif'],
+        alt: ['Alef', 'system-ui', 'sans-serif'],
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -38,11 +42,15 @@ export default {
           DEFAULT: 'hsl(var(--popover))',
           foreground: 'hsl(var(--popover-foreground))',
         },
+        stage: 'hsl(var(--stage))',
+        stand: 'hsl(var(--stand))',
+        score: 'hsl(var(--score))',
+        lamp: 'hsl(var(--lamp))',
         status: {
-          present: '#059669',
-          absent: '#e11d48',
-          late: '#f59e0b',
-          excused: '#0284c7',
+          present: 'hsl(var(--status-present))',
+          absent: 'hsl(var(--status-absent))',
+          late: 'hsl(var(--status-late))',
+          excused: 'hsl(var(--status-excused))',
           unmarked: '#a1a1aa',
         },
       },

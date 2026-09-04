@@ -287,14 +287,16 @@ export default function EnsemblePage() {
             </div>
           )}
 
-          <div
-            className="space-y-3 rounded-lg border border-s-4 p-4"
-            style={{ borderInlineStartColor: ensemble.color }}
-          >
-            <div className="flex flex-wrap items-center gap-2">
+          <div className="space-y-4 py-2">
+            <div className="flex flex-wrap items-center gap-3">
               <Select value={state} onValueChange={(v) => handleStateChange(v as DisplayState)}>
-                <SelectTrigger className={cn('w-44 border-0', DISPLAY_STATE_CLASS[state])}>
-                  <SelectValue />
+                <SelectTrigger
+                  className={cn(
+                    'h-auto w-auto gap-1.5 border-0 bg-transparent p-0 font-alt text-[11.5px] tracking-[.14em] shadow-none focus:ring-0',
+                    DISPLAY_STATE_CLASS[state],
+                  )}
+                >
+                  <SelectValue>{t(`sessionStatuses.${state}` as never).toUpperCase()}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={date > todayISO() ? 'future' : 'needs_entry'}>
@@ -304,35 +306,53 @@ export default function EnsemblePage() {
                   <SelectItem value="canceled">{t('sessionStatuses.canceled')}</SelectItem>
                 </SelectContent>
               </Select>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-[12.5px] text-faint">
                 {(selectedSession?.start_time ?? ensemble.start_time).slice(0, 5)}
               </span>
               {isCanceled && selectedSession?.cancel_reason && (
-                <span className="text-sm">
+                <span className="text-[12.5px] text-faint">
                   {t(`cancelReasons.${selectedSession.cancel_reason}` as never)}
                   {selectedSession.cancel_note ? ` — ${selectedSession.cancel_note}` : ''}
                 </span>
               )}
             </div>
 
+            {counts && (
+              <div className="space-y-1.5">
+                <div className="flex items-baseline gap-2 font-ui" style={{ fontWeight: 200 }}>
+                  <span className="text-[44px] leading-none tracking-[-.035em] tabular-nums">
+                    {counts.present + counts.absent + counts.late + counts.excused}
+                  </span>
+                  <span className="text-sm text-faint">of {roster.length}</span>
+                </div>
+                <div className="h-px w-full bg-hairline">
+                  <div
+                    className="h-px transition-[width] duration-500 ease-out"
+                    style={{
+                      width: roster.length ? `${((counts.present + counts.absent + counts.late + counts.excused) / roster.length) * 100}%` : '0%',
+                      backgroundColor: ensemble.color,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
             <Textarea
               value={noteDraft}
               onChange={(e) => handleSessionNote(e.target.value)}
               placeholder={t('attendance.rehearsalNotePlaceholder')}
               rows={2}
+              className="border-0 border-hairline bg-transparent px-0 shadow-none focus-visible:ring-0"
             />
 
-            {counts && (
-              <p className="text-sm text-muted-foreground">
-                {counts.present} {t('attendance.presentCount')} · {counts.absent} {t('attendance.absentCount')} ·{' '}
-                {counts.late} {t('attendance.lateCount')} · {counts.excused} {t('attendance.excusedCount')} ·{' '}
-                {counts.unmarked} {t('attendance.unmarkedCount')}
-              </p>
-            )}
-
-            <Button variant="outline" size="sm" disabled={isCanceled} onClick={handleMarkAllPresent}>
+            <button
+              type="button"
+              disabled={isCanceled}
+              onClick={handleMarkAllPresent}
+              className="font-ui text-[12.5px] font-light text-dim transition-colors hover:text-lamp disabled:opacity-50"
+            >
               {t('attendance.markAllPresent')}
-            </Button>
+            </button>
           </div>
 
           {sortedRoster.length === 0 ? (
@@ -341,65 +361,60 @@ export default function EnsemblePage() {
               action={<Button onClick={() => setAddOpen(true)}>{t('ensemble.addStudent')}</Button>}
             />
           ) : (
-            <div className={cn('rounded-lg border', isCanceled && 'opacity-50')}>
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-b-0">
-                    <SortableHead label={t('attendance.nameColumn')} active={sortKey === 'name'} dir={sortDir} onClick={() => toggleSort('name')} />
-                    <SortableHead label={t('attendance.instrumentColumn')} active={sortKey === 'instrument'} dir={sortDir} onClick={() => toggleSort('instrument')} />
-                    <SortableHead label={t('attendance.gradeColumn')} active={sortKey === 'grade'} dir={sortDir} onClick={() => toggleSort('grade')} />
-                    <TableHead className="text-center">{t('statuses.present')}</TableHead>
-                    <TableHead className="text-center">{t('statuses.absent')}</TableHead>
-                    <TableHead className="text-center">{t('statuses.late')}</TableHead>
-                    <TableHead className="text-center">{t('statuses.excused')}</TableHead>
-                    <TableHead className="text-center">{t('attendance.noteFor')}</TableHead>
-                    <TableHead />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {sortedRoster.map((student) => {
-                    const record = attendance?.find((a) => a.student_id === student.id)
-                    const current = (record?.status as AttStatus | undefined) ?? null
-                    return (
-                      <TableRow key={student.id} className="border-b-0">
-                        <TableCell className="font-medium">
+            <div className={cn('space-y-0', isCanceled && 'opacity-50')}>
+              <div className="flex items-center gap-4 pb-2 font-alt text-[10.5px] tracking-[.14em] text-faint">
+                <SortableHead label={t('attendance.nameColumn')} active={sortKey === 'name'} dir={sortDir} onClick={() => toggleSort('name')} />
+                <SortableHead label={t('attendance.instrumentColumn')} active={sortKey === 'instrument'} dir={sortDir} onClick={() => toggleSort('instrument')} />
+                <SortableHead label={t('attendance.gradeColumn')} active={sortKey === 'grade'} dir={sortDir} onClick={() => toggleSort('grade')} />
+              </div>
+              <ul>
+                {sortedRoster.map((student) => {
+                  const record = attendance?.find((a) => a.student_id === student.id)
+                  const current = (record?.status as AttStatus | undefined) ?? null
+                  return (
+                    <li
+                      key={student.id}
+                      className="flex flex-wrap items-center gap-x-3 gap-y-1 py-3.5 shadow-separator"
+                    >
+                      <div className="min-w-0 flex-1 pe-2">
+                        <p className="text-[15.5px] tracking-[-.005em] text-score">
                           {student.first_name} {student.last_name}
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">{student.instrument}</TableCell>
-                        <TableCell className="text-muted-foreground">{student.grade}</TableCell>
+                        </p>
+                        {(student.instrument || student.grade) && (
+                          <p className="mt-[3px] text-[11.5px] text-faint">
+                            {[student.instrument, student.grade].filter(Boolean).join(' · ')}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center">
                         {(['present', 'absent', 'late', 'excused'] as const).map((s) => (
-                          <TableCell key={s} className="text-center">
-                            <StatusCell
-                              status={s}
-                              current={current}
-                              disabled={isCanceled}
-                              label={t(`statuses.${s}` as never)}
-                              onChange={(v) => handleStatus(student.id, v)}
-                            />
-                          </TableCell>
-                        ))}
-                        <TableCell className="text-center">
-                          <StudentNoteButton
-                            note={record?.note ?? null}
-                            disabled={isCanceled || !record}
-                            onSave={(note) => handleNote(student.id, note)}
+                          <StatusCell
+                            key={s}
+                            status={s}
+                            current={current}
+                            disabled={isCanceled}
+                            label={t(`statuses.${s}` as never)}
+                            onChange={(v) => handleStatus(student.id, v)}
                           />
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label={t('ensemble.removeStudent')}
-                            onClick={() => setRemoving(student)}
-                          >
-                            <X className="size-4 text-muted-foreground" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
+                        ))}
+                        <StudentNoteButton
+                          note={record?.note ?? null}
+                          disabled={isCanceled || !record}
+                          onSave={(note) => handleNote(student.id, note)}
+                        />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={t('ensemble.removeStudent')}
+                          onClick={() => setRemoving(student)}
+                        >
+                          <X className="size-4 text-faint" />
+                        </Button>
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
             </div>
           )}
         </TabsContent>
@@ -461,16 +476,14 @@ function SortableHead({
 }) {
   const Icon = active ? (dir === 'asc' ? ArrowUp : ArrowDown) : ArrowUpDown
   return (
-    <TableHead>
-      <button
-        type="button"
-        onClick={onClick}
-        className={cn('inline-flex items-center gap-1 hover:text-foreground', active && 'font-semibold text-foreground')}
-      >
-        {label}
-        <Icon className="size-3.5" />
-      </button>
-    </TableHead>
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn('inline-flex items-center gap-1 hover:text-score', active && 'text-score')}
+    >
+      {label}
+      <Icon className="size-3" />
+    </button>
   )
 }
 

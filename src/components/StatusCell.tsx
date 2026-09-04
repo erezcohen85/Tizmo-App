@@ -4,11 +4,11 @@ import { cn } from '@/lib/utils'
 type Status = 'present' | 'absent' | 'late' | 'excused'
 
 const ICONS: Record<Status, typeof Check> = { present: Check, absent: X, late: Clock, excused: Shield }
-const ACTIVE_CLASS: Record<Status, string> = {
-  present: 'bg-status-present text-white border-status-present',
-  absent: 'bg-status-absent text-white border-status-absent',
-  late: 'bg-status-late text-white border-status-late',
-  excused: 'bg-status-excused text-white border-status-excused',
+const STATUS_VAR: Record<Status, string> = {
+  present: '--status-present',
+  absent: '--status-absent',
+  late: '--status-late',
+  excused: '--status-excused',
 }
 
 export function StatusCell({
@@ -26,20 +26,25 @@ export function StatusCell({
 }) {
   const active = current === status
   const Icon = ICONS[status]
+  const colorVar = `hsl(var(${STATUS_VAR[status]}))`
   return (
     <button
       type="button"
       title={label}
       aria-label={label}
+      aria-pressed={active}
       disabled={disabled}
       onClick={() => onChange(active ? null : status)}
       className={cn(
-        'inline-flex size-9 items-center justify-center rounded-md border text-muted-foreground transition-colors',
-        active ? ACTIVE_CLASS[status] : 'hover:bg-accent',
+        'inline-flex size-11 items-center justify-center rounded-full transition-colors duration-300',
         disabled && 'opacity-50',
       )}
+      style={{
+        color: active ? colorVar : 'hsl(var(--faint) / var(--faint-a))',
+        backgroundColor: active ? `hsl(var(${STATUS_VAR[status]}) / 0.13)` : 'transparent',
+      }}
     >
-      <Icon className="size-4" />
+      <Icon className="size-[19px]" strokeWidth={1.4} />
     </button>
   )
 }

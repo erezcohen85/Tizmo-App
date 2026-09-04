@@ -12,11 +12,12 @@ export function displayState(status: SessionStatus, date: string, today = todayI
   return date > today ? 'future' : 'needs_entry'
 }
 
+/** Word colour per state — spec §5 "Session state": a word, not a badge. */
 export const DISPLAY_STATE_CLASS: Record<DisplayState, string> = {
-  future: 'bg-muted text-muted-foreground',
-  needs_entry: 'bg-amber-500 text-white',
-  held: 'bg-emerald-600 text-white',
-  canceled: 'bg-rose-600 text-white',
+  future: 'text-faint',
+  needs_entry: 'text-lamp',
+  held: 'text-status-present',
+  canceled: 'text-status-absent',
 }
 
 /** Filter options offered in the Sessions screen. */
