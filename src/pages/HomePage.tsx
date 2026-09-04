@@ -201,7 +201,10 @@ export default function HomePage() {
         <button
           type="button"
           onClick={() => setDayFilter(dayFilter === todayWeekday ? undefined : todayWeekday)}
-          className={cn('transition-colors', dayFilter === todayWeekday ? 'text-lamp' : 'text-dim hover:text-lamp')}
+          className={cn(
+            'font-normal text-lamp underline-offset-4 transition-colors',
+            dayFilter === todayWeekday && 'underline',
+          )}
         >
           {t('home.today')}
         </button>
@@ -265,7 +268,7 @@ export default function HomePage() {
                 className={cn('relative py-3.5 shadow-separator', canDrag && 'cursor-grab', dragId === e.id && 'opacity-50')}
               >
                 <div className="absolute end-0 top-3 flex items-center">
-                  {canDrag && <GripVertical className="size-3.5 text-faint" aria-label={t('home.dragHint')} />}
+                  {canDrag && <GripVertical className="size-3.5 text-dim transition-colors hover:text-lamp" aria-label={t('home.dragHint')} />}
                   <EnsembleMenu e={e} index={index} />
                 </div>
 
@@ -295,7 +298,7 @@ export default function HomePage() {
                 {...dragProps(e.id)}
                 className={cn('flex flex-wrap items-center gap-3 py-3.5 shadow-separator', canDrag && 'cursor-grab', dragId === e.id && 'opacity-50')}
               >
-                {canDrag && <GripVertical className="size-3.5 text-faint" aria-label={t('home.dragHint')} />}
+                {canDrag && <GripVertical className="size-3.5 text-dim transition-colors hover:text-lamp" aria-label={t('home.dragHint')} />}
                 <EnsembleDot color={e.color} />
                 <Link to={`/ensemble/${e.id}`} className="min-w-40 flex-1">
                   <p className="text-[15.5px] tracking-[-.005em] text-score">{e.name}</p>
