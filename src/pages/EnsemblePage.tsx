@@ -260,10 +260,14 @@ export default function EnsemblePage() {
         <TabsContent value="attendance" className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <DateNav date={date} onChange={setDate} availableDates={availableDates} />
-            <Button variant="outline" size="sm" onClick={() => setAddOpen(true)}>
-              <Plus className="size-4" />
+            <button
+              type="button"
+              onClick={() => setAddOpen(true)}
+              className="inline-flex items-center gap-1.5 font-ui text-[12.5px] font-light text-dim transition-colors hover:text-lamp"
+            >
+              <Plus className="size-3.5" strokeWidth={1.4} />
               {t('ensemble.addStudent')}
-            </Button>
+            </button>
           </div>
 
           {!isRegularDay && <p className="text-sm text-muted-foreground">{t('attendance.notRegularDay')}</p>}
@@ -402,14 +406,14 @@ export default function EnsemblePage() {
                           disabled={isCanceled || !record}
                           onSave={(note) => handleNote(student.id, note)}
                         />
-                        <Button
-                          variant="ghost"
-                          size="icon"
+                        <button
+                          type="button"
                           aria-label={t('ensemble.removeStudent')}
                           onClick={() => setRemoving(student)}
+                          className="inline-flex size-11 items-center justify-center text-faint transition-colors hover:text-status-absent"
                         >
-                          <X className="size-4 text-faint" />
-                        </Button>
+                          <X className="size-4" strokeWidth={1.4} />
+                        </button>
                       </div>
                     </li>
                   )

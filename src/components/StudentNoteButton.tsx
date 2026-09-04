@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { MessageSquare, MessageSquareText } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Textarea } from '@/components/ui/textarea'
 import { useI18n } from '@/i18n'
@@ -34,9 +33,14 @@ export function StudentNoteButton({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" disabled={disabled} aria-label={t('attendance.noteFor')}>
-          {note ? <MessageSquareText className="size-4 text-primary" /> : <MessageSquare className="size-4 text-muted-foreground" />}
-        </Button>
+        <button
+          type="button"
+          disabled={disabled}
+          aria-label={t('attendance.noteFor')}
+          className="inline-flex size-11 items-center justify-center text-faint transition-colors hover:text-lamp disabled:pointer-events-none disabled:opacity-40"
+        >
+          {note ? <MessageSquareText className="size-4 text-lamp" strokeWidth={1.4} /> : <MessageSquare className="size-4" strokeWidth={1.4} />}
+        </button>
       </PopoverTrigger>
       <PopoverContent className="w-64 space-y-2">
         {disabled ? (
