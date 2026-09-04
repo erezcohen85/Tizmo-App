@@ -1,7 +1,26 @@
-import { Button } from '@/components/ui/button'
 import { useI18n } from '@/i18n'
 import { useTheme, type Theme } from '@/lib/theme'
 import { cn } from '@/lib/utils'
+
+function OptionRow<T extends string>({ options, value, onChange }: { options: { value: T; label: string }[]; value: T; onChange: (v: T) => void }) {
+  return (
+    <div className="flex gap-5">
+      {options.map((opt) => (
+        <button
+          key={opt.value}
+          type="button"
+          onClick={() => onChange(opt.value)}
+          className={cn(
+            'font-ui text-[12.5px] font-light transition-colors',
+            value === opt.value ? 'text-lamp' : 'text-dim hover:text-score',
+          )}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  )
+}
 
 export default function SettingsPage() {
   const { t, lang, setLang } = useI18n()
@@ -14,48 +33,37 @@ export default function SettingsPage() {
   ]
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <section className="space-y-3 rounded-lg border p-4">
-        <h2 className="font-semibold">{t('settings.appearance')}</h2>
+    <div className="mx-auto max-w-2xl space-y-11">
+      <section className="space-y-6">
+        <p className="font-alt text-[11.5px] tracking-[.18em] text-faint">{t('settings.appearance').toUpperCase()}</p>
 
-        <div className="space-y-1">
-          <p className="text-sm text-muted-foreground">{t('settings.theme')}</p>
-          <div className="flex gap-2">
-            {themes.map((opt) => (
-              <Button
-                key={opt.value}
-                variant={theme === opt.value ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setTheme(opt.value)}
-              >
-                {opt.label}
-              </Button>
-            ))}
-          </div>
+        <div className="space-y-2">
+          <p className="text-[12px] text-faint">{t('settings.theme')}</p>
+          <OptionRow options={themes} value={theme} onChange={setTheme} />
         </div>
 
-        <div className="space-y-1">
-          <p className="text-sm text-muted-foreground">{t('settings.language')}</p>
-          <div className="flex gap-2">
-            <Button variant={lang === 'he' ? 'default' : 'outline'} size="sm" onClick={() => setLang('he')}>
-              עברית
-            </Button>
-            <Button variant={lang === 'en' ? 'default' : 'outline'} size="sm" onClick={() => setLang('en')}>
-              English
-            </Button>
-          </div>
+        <div className="space-y-2">
+          <p className="text-[12px] text-faint">{t('settings.language')}</p>
+          <OptionRow
+            options={[
+              { value: 'he' as const, label: 'עברית' },
+              { value: 'en' as const, label: 'English' },
+            ]}
+            value={lang}
+            onChange={setLang}
+          />
         </div>
       </section>
 
-      <section className="space-y-2 rounded-lg border p-4">
-        <h2 className="font-semibold">{t('settings.account')}</h2>
-        <p className={cn('text-sm text-muted-foreground')}>{t('settings.accountHint')}</p>
+      <section className="space-y-2 shadow-separator pt-6">
+        <p className="font-alt text-[11.5px] tracking-[.18em] text-faint">{t('settings.account').toUpperCase()}</p>
+        <p className="text-[13px] text-dim">{t('settings.accountHint')}</p>
       </section>
 
-      <section className="space-y-2 rounded-lg border p-4">
-        <h2 className="font-semibold">{t('settings.about')}</h2>
-        <p className="text-sm text-muted-foreground">{t('settings.aboutText')}</p>
-        <p className="text-sm text-muted-foreground">{t('app.name')}</p>
+      <section className="space-y-2 shadow-separator pt-6">
+        <p className="font-alt text-[11.5px] tracking-[.18em] text-faint">{t('settings.about').toUpperCase()}</p>
+        <p className="text-[13px] text-dim">{t('settings.aboutText')}</p>
+        <p className="text-[13px] text-dim">{t('app.name')}</p>
       </section>
     </div>
   )

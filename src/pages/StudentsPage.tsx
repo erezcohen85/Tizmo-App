@@ -62,37 +62,42 @@ export default function StudentsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <Input placeholder={t('manage.search')} value={search} onChange={(e) => setSearch(e.target.value)} className="w-48" />
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-ui text-[12.5px] font-light">
+        <input
+          placeholder={t('manage.search')}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-40 border-0 border-b border-hairline bg-transparent pb-0.5 text-score outline-none placeholder:text-faint"
+        />
         <EnsembleSelect ensembles={ensembles ?? []} value={ensembleFilter} onChange={setEnsembleFilter} allowAll />
-        <label className="flex items-center gap-1 text-sm">
+        <label className="flex items-center gap-1.5 text-dim">
           <input type="checkbox" checked={showTerminated} onChange={(e) => setShowTerminated(e.target.checked)} />
           {t('manage.showTerminated')}
         </label>
-        <div className="ms-auto flex gap-2">
-          <Button size="sm" onClick={() => setEditing('new')}>
-            <Plus className="size-4" />
+        <div className="ms-auto flex items-center gap-4">
+          <button type="button" onClick={() => setEditing('new')} className="inline-flex items-center gap-1.5 text-dim transition-colors hover:text-lamp">
+            <Plus className="size-3.5" strokeWidth={1.4} />
             {t('manage.newStudent')}
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
-            <Upload className="size-4" />
+          </button>
+          <button type="button" onClick={() => setImportOpen(true)} className="inline-flex items-center gap-1.5 text-dim transition-colors hover:text-lamp">
+            <Upload className="size-3.5" strokeWidth={1.4} />
             {t('manage.tabImport')}
-          </Button>
+          </button>
         </div>
       </div>
 
-      <ul className="divide-y rounded-lg border">
+      <ul>
         {filtered.map((s) => {
           const own = (memberships ?? []).filter((m) => m.student_id === s.id)
           return (
-            <li key={s.id} className="flex flex-wrap items-center gap-2 p-3">
+            <li key={s.id} className="flex flex-wrap items-center gap-3 py-3.5 shadow-separator">
               <button type="button" className="min-w-40 flex-1 text-start" onClick={() => setDetail(s)}>
-                <p className="font-medium">
+                <p className="text-[15.5px] tracking-[-.005em] text-score">
                   {s.first_name} {s.last_name}
                 </p>
-                <p className="text-sm text-muted-foreground">{[s.instrument, s.grade].filter(Boolean).join(' · ')}</p>
+                <p className="mt-[3px] text-[11.5px] text-faint">{[s.instrument, s.grade].filter(Boolean).join(' · ')}</p>
               </button>
-              <div className="flex flex-wrap gap-1">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11.5px]">
                 {own.map((m) => {
                   const ensemble = ensembles?.find((e) => e.id === m.ensemble_id)
                   if (!ensemble) return null
@@ -100,21 +105,23 @@ export default function StudentsPage() {
                   return (
                     <span
                       key={m.ensemble_id}
-                      className={cn('flex items-center gap-1 rounded px-1.5 py-0.5 text-xs', terminated && 'opacity-50')}
-                      style={{ backgroundColor: `${ensemble.color}26`, color: ensemble.color }}
+                      className={cn('inline-flex items-center gap-1 text-faint', terminated && 'opacity-50 line-through')}
                     >
-                      <EnsembleDot color={ensemble.color} className="size-1.5" />
+                      <EnsembleDot color={ensemble.color} />
                       {ensemble.name}
                     </span>
                   )
                 })}
               </div>
-              <Button variant="ghost" size="sm" onClick={() => setEditing(s)}>
+              <button
+                type="button"
+                onClick={() => setEditing(s)}
+                className="font-ui text-[12.5px] font-light text-dim transition-colors hover:text-lamp"
+              >
                 {t('common.edit')}
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
+              </button>
+              <button
+                type="button"
                 onClick={async () => {
                   if (!confirm(t('session.deleteConfirm'))) return
                   try {
@@ -124,13 +131,14 @@ export default function StudentsPage() {
                     toast.error(t('errors.saveFailed'))
                   }
                 }}
+                className="font-ui text-[12.5px] font-light text-dim transition-colors hover:text-status-absent"
               >
                 {t('common.delete')}
-              </Button>
+              </button>
             </li>
           )
         })}
-        {filtered.length === 0 && <li className="p-4 text-sm text-muted-foreground">—</li>}
+        {filtered.length === 0 && <li className="py-4 text-[12.5px] text-faint">—</li>}
       </ul>
 
       <StudentSheet

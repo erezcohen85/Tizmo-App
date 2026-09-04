@@ -17,7 +17,7 @@ export function EnsembleSelect({
   const { t } = useI18n()
   return (
     <Select value={value ?? '__all__'} onValueChange={(v) => onChange(v === '__all__' ? undefined : v)}>
-      <SelectTrigger className="w-full sm:w-56">
+      <SelectTrigger className="h-auto w-auto gap-1 border-0 bg-transparent p-0 font-ui text-[12.5px] font-light text-dim shadow-none focus:ring-0">
         <SelectValue placeholder={t('attendance.ensemble')} />
       </SelectTrigger>
       <SelectContent>

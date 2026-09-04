@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
+import { EnsembleDot } from '@/components/EnsembleDot'
 import { EnsembleSelect } from '@/components/EnsembleSelect'
 import { useI18n } from '@/i18n'
 import { shiftISODate, todayISO, toISODate } from '@/lib/dates'
@@ -96,11 +97,11 @@ export default function SessionsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-ui text-[12.5px] font-light">
         <EnsembleSelect ensembles={ensembles ?? []} value={ensembleId} onChange={setEnsembleId} allowAll />
 
         <Select value={kind ?? '__all__'} onValueChange={(v) => setKind(v === '__all__' ? undefined : v)}>
-          <SelectTrigger className="w-44">
+          <SelectTrigger className="h-auto w-auto gap-1 border-0 bg-transparent p-0 text-[12.5px] font-light text-dim shadow-none focus:ring-0">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -114,7 +115,7 @@ export default function SessionsPage() {
         </Select>
 
         <Select value={state ?? '__all__'} onValueChange={(v) => setState(v === '__all__' ? undefined : (v as DisplayState))}>
-          <SelectTrigger className="w-44">
+          <SelectTrigger className="h-auto w-auto gap-1 border-0 bg-transparent p-0 text-[12.5px] font-light text-dim shadow-none focus:ring-0">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -127,24 +128,34 @@ export default function SessionsPage() {
           </SelectContent>
         </Select>
 
-        <div className="flex items-center gap-1">
-          <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="w-40" />
-          <span className="text-sm text-muted-foreground">{t('history.to')}</span>
-          <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="w-40" />
+        <div className="flex items-center gap-1.5 text-dim">
+          <input
+            type="date"
+            value={from}
+            onChange={(e) => setFrom(e.target.value)}
+            className="border-0 bg-transparent font-ui text-[12.5px] font-light text-dim outline-none"
+          />
+          <span className="text-faint">{t('history.to')}</span>
+          <input
+            type="date"
+            value={to}
+            onChange={(e) => setTo(e.target.value)}
+            className="border-0 bg-transparent font-ui text-[12.5px] font-light text-dim outline-none"
+          />
         </div>
 
-        <div className="ms-auto flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => handleExport('csv')}>
+        <div className="ms-auto flex items-center gap-4">
+          <button type="button" onClick={() => handleExport('csv')} className="text-dim transition-colors hover:text-lamp">
             {t('history.exportCsv')}
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => handleExport('xlsx')}>
+          </button>
+          <button type="button" onClick={() => handleExport('xlsx')} className="text-dim transition-colors hover:text-lamp">
             {t('history.exportExcel')}
-          </Button>
+          </button>
           <CreateSessionDialog open={createOpen} onOpenChange={setCreateOpen} ensembles={ensembles ?? []} />
         </div>
       </div>
 
-      <ul className="divide-y rounded-lg border">
+      <ul>
         {filtered.map((s) => {
           const sessionEnsembles = s.ensemble_ids
             .map((id) => ensembles?.find((e) => e.id === id))
@@ -152,38 +163,46 @@ export default function SessionsPage() {
           const size = rosterSizeFor(s)
           const counts = computeSessionCounts(s.id, attendanceRows ?? [], size)
           const st = displayState(s.status, s.date)
+          const [, m, d] = s.date.split('-')
           return (
             <li
               key={s.id}
-              className="flex cursor-pointer flex-wrap items-center gap-2 p-3 hover:bg-accent"
+              className="flex cursor-pointer flex-wrap items-center gap-3 py-3.5 shadow-separator"
               onClick={() => setOpenSession(s)}
             >
-              <span className="w-24 text-sm text-muted-foreground">{s.date}</span>
-              <span className={cn('rounded px-1.5 py-0.5 text-xs', DISPLAY_STATE_CLASS[st])}>
-                {t(`sessionStatuses.${st}` as never)}
-              </span>
-              <span className="rounded bg-secondary px-1.5 py-0.5 text-xs">{t(`kinds.${s.kind}` as never)}</span>
-              {s.title && <span className="text-sm">{s.title}</span>}
-              <span className="flex flex-wrap gap-1">
-                {sessionEnsembles.map((e) => (
+              <span className="w-9 shrink-0 text-end font-ui text-[17px] font-light tabular-nums text-score">{d}</span>
+              <div className="min-w-0 flex-1">
+                <p className="flex items-center gap-2 text-[14.5px] text-score">
+                  {s.title || t(`kinds.${s.kind}` as never)}
                   <span
-                    key={e.id}
-                    className="rounded px-1.5 py-0.5 text-xs"
-                    style={{ backgroundColor: `${e.color}26`, color: e.color }}
-                  >
-                    {e.name}
-                  </span>
-                ))}
-              </span>
+                    className={cn(
+                      'size-1.5 shrink-0 rounded-full',
+                      st === 'held' && 'bg-status-present',
+                      st === 'needs_entry' && 'bg-lamp',
+                      st === 'canceled' && 'border border-status-absent',
+                      st === 'future' && 'bg-faint',
+                    )}
+                  />
+                </p>
+                <p className="mt-[3px] flex flex-wrap items-center gap-x-2 text-[11.5px] text-faint">
+                  {`${m}-${d}`}
+                  {sessionEnsembles.map((e) => (
+                    <span key={e.id} className="inline-flex items-center gap-1">
+                      <EnsembleDot color={e.color} />
+                      {e.name}
+                    </span>
+                  ))}
+                </p>
+              </div>
               {st === 'held' && (
-                <span className="ms-auto text-xs text-muted-foreground">
+                <span className="text-[12px] tabular-nums text-faint">
                   {counts.present}/{size}
                 </span>
               )}
             </li>
           )
         })}
-        {filtered.length === 0 && <li className="p-4 text-sm text-muted-foreground">—</li>}
+        {filtered.length === 0 && <li className="py-4 text-[12.5px] text-faint">—</li>}
       </ul>
 
       <SessionDetailSheet
@@ -246,7 +265,9 @@ function CreateSessionDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button size="sm">{t('sessions.new')}</Button>
+        <button type="button" className="font-ui text-[12.5px] font-light text-lamp transition-colors hover:opacity-80">
+          {t('sessions.new')}
+        </button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
