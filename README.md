@@ -1,4 +1,4 @@
-# Tutti — Attendance App
+# Tizmo — Attendance for Music Educators
 
 Attendance tracking for band and ensemble rehearsals. Vite + React + TypeScript frontend, Supabase (Postgres + RLS + Edge Functions) backend. Hebrew/English with full RTL, light/dark themes.
 

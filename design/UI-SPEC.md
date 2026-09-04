@@ -1,4 +1,4 @@
-# Tutti — UI Design Spec
+# Tizmo — UI Design Spec
 
 The approved visual direction. Interactive reference: `design/tutti-redesign.html` was the first
 (rejected) pass; the approved one is the published artifact **"Tutti Before the Downbeat"**

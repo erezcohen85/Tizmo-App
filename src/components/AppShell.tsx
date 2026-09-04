@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { CalendarDays, Home, Settings, Users } from 'lucide-react'
 import { useI18n } from '@/i18n'
+import { Logo } from '@/components/Logo'
 import { cn } from '@/lib/utils'
 
 const NAV_ITEMS = [
@@ -15,9 +16,8 @@ export function AppShell() {
 
   return (
     <div className="relative flex min-h-dvh flex-col bg-stage">
-      <header className="sticky top-0 z-20 flex items-center gap-2 px-5 py-4">
-        <span className="size-[5px] shrink-0 rounded-full bg-lamp" aria-hidden />
-        <span className="font-ui text-[16px] font-normal tracking-[-.01em] text-score">{t('app.name')}</span>
+      <header className="sticky top-0 z-20 flex items-center px-5 py-4">
+        <Logo title={t('app.name')} />
       </header>
 
       <main className="relative z-[1] mx-auto w-full max-w-6xl flex-1 px-5 pb-24 pt-2">

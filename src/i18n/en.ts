@@ -1,5 +1,5 @@
 const en = {
-  app: { name: 'Band Attendance' },
+  app: { name: 'Tizmo' },
   nav: { home: 'Home', sessions: 'Sessions', students: 'Students', settings: 'Settings' },
   weekdays: {
     sunday: 'Sunday',

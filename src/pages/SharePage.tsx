@@ -11,7 +11,7 @@ import { exportRows } from '@/lib/export'
 import { callShareHistory, type ShareHistoryResponse } from '@/lib/functions'
 
 export default function SharePage() {
-  const { t, lang, setLang } = useI18n()
+  const { t, lang, setLang, dir } = useI18n()
   const { token } = useParams<{ token: string }>()
   const [params, setParams] = useSearchParams()
 
@@ -161,7 +161,7 @@ export default function SharePage() {
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={activeTab} onValueChange={setActiveTab} dir={dir}>
         <TabsList>
           <TabsTrigger value="bySession">{t('history.bySession')}</TabsTrigger>
           <TabsTrigger value="byStudent">{t('history.byStudent')}</TabsTrigger>

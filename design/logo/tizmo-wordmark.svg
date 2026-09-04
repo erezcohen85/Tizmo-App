@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="28 34 306 116" role="img" aria-label="Tizmo">
+  <title>Tizmo</title>
+  <!-- Requires the Fraunces webfont to be loaded by the host document. -->
+  <text x="180" y="106" text-anchor="middle"
+        font-family="Fraunces, Georgia, serif" font-weight="300" font-size="80"
+        letter-spacing="1" fill="currentColor">Tizmo</text>
+  <path d="M 38 132 C 100 116, 150 144, 200 130 C 248 117, 296 140, 322 126"
+        fill="none" stroke="#B8863B" stroke-width="5" stroke-linecap="round"/>
+</svg>

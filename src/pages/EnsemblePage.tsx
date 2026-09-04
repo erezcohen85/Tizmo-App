@@ -45,7 +45,7 @@ type CancelReason = Database['public']['Enums']['cancel_reason']
 type AttStatus = 'present' | 'absent' | 'late' | 'excused'
 
 export default function EnsemblePage() {
-  const { t } = useI18n()
+  const { t, dir } = useI18n()
   const navigate = useNavigate()
   const { ensembleId } = useParams<{ ensembleId: string }>()
   const [params, setParams] = useSearchParams()
@@ -251,7 +251,7 @@ export default function EnsemblePage() {
         />
       </div>
 
-      <Tabs defaultValue="attendance">
+      <Tabs defaultValue="attendance" dir={dir}>
         <TabsList>
           <TabsTrigger value="attendance">{t('ensemble.tabAttendance')}</TabsTrigger>
           <TabsTrigger value="overview">{t('ensemble.tabOverview')}</TabsTrigger>

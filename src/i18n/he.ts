@@ -1,7 +1,7 @@
 import type { Dict } from './en'
 
 const he: Dict = {
-  app: { name: 'נוכחות תזמורת' },
+  app: { name: 'Tizmo' },
   nav: { home: 'בית', sessions: 'מפגשים', students: 'תלמידים', settings: 'הגדרות' },
   weekdays: {
     sunday: 'ראשון',
