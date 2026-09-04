@@ -31,3 +31,6 @@ supabase/.temp/
 
 # Stitch downloads
 .stitch/
+
+# Local Netlify folder
+.netlify
