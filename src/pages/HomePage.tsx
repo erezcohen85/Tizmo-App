@@ -265,25 +265,20 @@ export default function HomePage() {
               <div
                 key={e.id}
                 {...dragProps(e.id)}
-                className={cn(
-                  'relative flex items-start gap-2 py-3.5 shadow-separator',
-                  canDrag && 'cursor-grab',
-                  dragId === e.id && 'opacity-50',
-                )}
+                className={cn('relative py-3.5 shadow-separator', canDrag && 'cursor-grab', dragId === e.id && 'opacity-50')}
               >
-                {canDrag && (
-                  <GripVertical
-                    className="mt-0.5 size-3.5 shrink-0 text-dim transition-colors hover:text-lamp"
-                    aria-label={t('home.dragHint')}
-                  />
-                )}
-
                 <div className="absolute end-0 top-3">
                   <EnsembleMenu e={e} index={index} />
                 </div>
 
-                <Link to={`/ensemble/${e.id}`} className="block min-w-0 flex-1 pe-12">
+                <Link to={`/ensemble/${e.id}`} className="block pe-12">
                   <p className="flex items-center gap-2 text-[15.5px] tracking-[-.005em] text-score">
+                    {canDrag && (
+                      <GripVertical
+                        className="size-3.5 shrink-0 text-dim transition-colors hover:text-lamp"
+                        aria-label={t('home.dragHint')}
+                      />
+                    )}
                     <EnsembleDot color={e.color} />
                     {e.name}
                     {needsEntry > 0 && <span className="size-[5px] rounded-full bg-lamp" aria-label={t('home.needsEntry')} />}
