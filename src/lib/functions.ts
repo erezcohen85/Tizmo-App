@@ -1,4 +1,4 @@
-import { FUNCTIONS_URL } from './supabase'
+import { FUNCTIONS_URL, supabase } from './supabase'
 
 const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string
 
@@ -57,21 +57,21 @@ export type ShareLink = {
   created_at: string
 }
 
-export async function callManageShareLink(
-  secret: string,
-  body: { action: 'list' } | { action: 'create'; scope: 'all' | 'single_ensemble'; ensemble_id?: string; label?: string } | { action: 'revoke'; id: string } | { action: 'regenerate'; id: string },
-): Promise<{ ok: true; data: { links?: ShareLink[]; link?: ShareLink } } | { ok: false; status: number; error: string }> {
-  const res = await fetch(`${FUNCTIONS_URL}/manage-share-link`, {
+export async function callDeleteAccount(): Promise<{ ok: true } | { ok: false; status: number; error: string }> {
+  const { data } = await supabase.auth.getSession()
+  const accessToken = data.session?.access_token
+  if (!accessToken) return { ok: false, status: 401, error: 'unauthorized' }
+
+  const res = await fetch(`${FUNCTIONS_URL}/delete-account`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
       apikey: ANON_KEY,
-      Authorization: `Bearer ${ANON_KEY}`,
-      'x-admin-secret': secret,
+      Authorization: `Bearer ${accessToken}`,
     },
-    body: JSON.stringify(body),
   })
-  const responseBody = await res.json()
-  if (!res.ok) return { ok: false, status: res.status, error: (responseBody as { error: string }).error ?? 'error' }
-  return { ok: true, data: responseBody }
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    return { ok: false, status: res.status, error: (body as { error?: string }).error ?? 'error' }
+  }
+  return { ok: true }
 }

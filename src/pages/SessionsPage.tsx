@@ -179,35 +179,30 @@ export default function SessionsPage() {
           return (
             <li
               key={s.id}
-              className="flex cursor-pointer flex-wrap items-center gap-3 py-3.5 shadow-separator"
+              className="flex cursor-pointer items-center gap-3 py-3.5 shadow-separator"
               onClick={() => setOpenSession(s)}
             >
-              <span className="w-9 shrink-0 text-end font-ui text-[17px] font-light tabular-nums text-score">{d}</span>
-              <div className="min-w-0 flex-1">
-                <p className="flex items-center gap-2 text-[14.5px] text-score">
-                  {s.title || t(`kinds.${s.kind}` as never)}
-                  <span
-                    className={cn(
-                      'size-1.5 shrink-0 rounded-full',
-                      st === 'held' && 'bg-status-present',
-                      st === 'needs_entry' && 'bg-lamp',
-                      st === 'canceled' && 'border border-status-absent',
-                      st === 'future' && 'bg-faint',
-                    )}
-                  />
-                </p>
-                <p className="mt-[3px] flex flex-wrap items-center gap-x-2 text-[11.5px] text-faint">
-                  {`${m}-${d}`}
-                  {sessionEnsembles.map((e) => (
-                    <span key={e.id} className="inline-flex items-center gap-1">
-                      <EnsembleDot color={e.color} />
-                      {e.name}
-                    </span>
-                  ))}
-                </p>
+              <span className="shrink-0 font-ui text-[17px] font-light tabular-nums text-score">{`${d}.${m}`}</span>
+              <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden">
+                <span
+                  className={cn(
+                    'size-1.5 shrink-0 rounded-full',
+                    st === 'held' && 'bg-status-present',
+                    st === 'needs_entry' && 'bg-lamp',
+                    st === 'canceled' && 'border border-status-absent',
+                    st === 'future' && 'bg-faint',
+                  )}
+                />
+                <p className="truncate text-[13.5px] text-score">{s.title || t(`kinds.${s.kind}` as never)}</p>
+                {sessionEnsembles.map((e) => (
+                  <span key={e.id} className="inline-flex shrink-0 items-center gap-1 text-[11.5px] text-faint">
+                    <EnsembleDot color={e.color} />
+                    {e.name}
+                  </span>
+                ))}
               </div>
               {st === 'held' && (
-                <span className="text-[12px] tabular-nums text-faint">
+                <span className="shrink-0 text-[12px] tabular-nums text-faint">
                   {counts.present}/{size}
                 </span>
               )}

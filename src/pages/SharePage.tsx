@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Logo } from '@/components/Logo'
+import { OptionRow } from '@/components/OptionRow'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useI18n } from '@/i18n'
 import { shiftISODate, todayISO } from '@/lib/dates'
 import { exportRows } from '@/lib/export'
 import { callShareHistory, type ShareHistoryResponse } from '@/lib/functions'
 
+const FILTER_TRIGGER_CLASS =
+  'h-auto w-auto gap-1 border-0 bg-transparent p-0 text-[12.5px] font-light text-dim shadow-none focus:ring-0'
+
 export default function SharePage() {
-  const { t, lang, setLang, dir } = useI18n()
+  const { t, lang, setLang } = useI18n()
   const { token } = useParams<{ token: string }>()
   const [params, setParams] = useSearchParams()
 
@@ -40,13 +42,20 @@ export default function SharePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, ensembleId, kind, from, to])
 
-  const [activeTab, setActiveTab] = useState('bySession')
+  const [activeTab, setActiveTab] = useState<'bySession' | 'byStudent'>('bySession')
 
-  if (state.status === 'loading') return <div className="p-6 text-sm text-muted-foreground">…</div>
+  if (state.status === 'loading') {
+    return (
+      <div className="flex min-h-dvh items-center justify-center bg-stage">
+        <p className="text-[15px] font-light text-faint">…</p>
+      </div>
+    )
+  }
   if (state.status === 'error') {
     return (
-      <div className="p-6">
-        <p>{state.error === 'revoked' ? t('share.revoked') : t('share.invalid')}</p>
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-stage px-5 text-center">
+        <Logo className="h-9 w-auto" title={t('app.name')} />
+        <p className="text-[15px] font-light text-dim">{state.error === 'revoked' ? t('share.revoked') : t('share.invalid')}</p>
       </div>
     )
   }
@@ -105,68 +114,86 @@ export default function SharePage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-4 p-4">
-      <div className="flex items-center justify-between">
-        <span className="font-semibold">{t('app.name')}</span>
-        <div className="flex overflow-hidden rounded-md border text-sm">
-          <button type="button" onClick={() => setLang('he')} className={lang === 'he' ? 'bg-primary px-2 py-1 text-primary-foreground' : 'px-2 py-1'}>
-            עברית
-          </button>
-          <button type="button" onClick={() => setLang('en')} className={lang === 'en' ? 'bg-primary px-2 py-1 text-primary-foreground' : 'px-2 py-1'}>
-            EN
-          </button>
+    <div className="min-h-dvh bg-stage px-5 pb-16 pt-6">
+      <div className="mx-auto max-w-6xl space-y-6">
+        <div className="flex items-center justify-between">
+          <Logo className="h-8 w-auto" title={t('app.name')} />
+          <OptionRow
+            options={[
+              { value: 'he' as const, label: 'עברית' },
+              { value: 'en' as const, label: 'English' },
+            ]}
+            value={lang}
+            onChange={setLang}
+          />
         </div>
-      </div>
 
-      {data.truncated && <p className="rounded bg-accent p-2 text-sm">{t('share.truncated')}</p>}
+        {data.truncated && <p className="font-alt text-[11.5px] tracking-[.1em] text-faint">{t('share.truncated')}</p>}
 
-      <div className="flex flex-wrap items-end gap-2">
-        {data.scope === 'all' && (
-          <Select value={ensembleId ?? '__all__'} onValueChange={(v) => setEnsembleId(v === '__all__' ? undefined : v)}>
-            <SelectTrigger className="w-48">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-ui text-[12.5px] font-light">
+          {data.scope === 'all' && (
+            <Select value={ensembleId ?? '__all__'} onValueChange={(v) => setEnsembleId(v === '__all__' ? undefined : v)}>
+              <SelectTrigger className={FILTER_TRIGGER_CLASS}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__all__">{t('manage.allEnsembles')}</SelectItem>
+                {data.ensembles.map((e) => (
+                  <SelectItem key={e.id} value={e.id}>
+                    {e.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          <Select value={kind ?? '__all__'} onValueChange={(v) => setKind(v === '__all__' ? undefined : v)}>
+            <SelectTrigger className={FILTER_TRIGGER_CLASS}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="__all__">{t('manage.allEnsembles')}</SelectItem>
-              {data.ensembles.map((e) => (
-                <SelectItem key={e.id} value={e.id}>
-                  {e.name}
+              <SelectItem value="__all__">{t('sessions.allTypes')}</SelectItem>
+              {(['rehearsal', 'special_rehearsal', 'field_trip', 'exam', 'concert', 'other'] as const).map((k) => (
+                <SelectItem key={k} value={k}>
+                  {t(`kinds.${k}` as never)}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-        )}
-        <Select value={kind ?? '__all__'} onValueChange={(v) => setKind(v === '__all__' ? undefined : v)}>
-          <SelectTrigger className="w-40">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="__all__">{t('sessions.allTypes')}</SelectItem>
-            {(['rehearsal', 'special_rehearsal', 'field_trip', 'exam', 'concert', 'other'] as const).map((k) => (
-              <SelectItem key={k} value={k}>
-                {t(`kinds.${k}` as never)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="w-40" />
-        <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="w-40" />
-        <div className="ms-auto flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => handleExport('csv')}>
-            {t('history.exportCsv')}
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => handleExport('xlsx')}>
-            {t('history.exportExcel')}
-          </Button>
+          <div className="flex items-center gap-1.5 text-dim">
+            <input
+              type="date"
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+              className="border-0 bg-transparent font-ui text-[12.5px] font-light text-dim outline-none"
+            />
+            <span className="text-faint">{t('history.to')}</span>
+            <input
+              type="date"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+              className="border-0 bg-transparent font-ui text-[12.5px] font-light text-dim outline-none"
+            />
+          </div>
+          <div className="ms-auto flex items-center gap-4">
+            <button type="button" onClick={() => handleExport('csv')} className="text-dim transition-colors hover:text-lamp">
+              {t('history.exportCsv')}
+            </button>
+            <button type="button" onClick={() => handleExport('xlsx')} className="text-dim transition-colors hover:text-lamp">
+              {t('history.exportExcel')}
+            </button>
+          </div>
         </div>
-      </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} dir={dir}>
-        <TabsList>
-          <TabsTrigger value="bySession">{t('history.bySession')}</TabsTrigger>
-          <TabsTrigger value="byStudent">{t('history.byStudent')}</TabsTrigger>
-        </TabsList>
-        <TabsContent value="bySession" className="overflow-x-auto">
+        <OptionRow
+          options={[
+            { value: 'bySession' as const, label: t('history.bySession') },
+            { value: 'byStudent' as const, label: t('history.byStudent') },
+          ]}
+          value={activeTab}
+          onChange={setActiveTab}
+        />
+
+        {activeTab === 'bySession' && (
           <Table>
             <TableHeader>
               <TableRow>
@@ -201,8 +228,8 @@ export default function SharePage() {
               ))}
             </TableBody>
           </Table>
-        </TabsContent>
-        <TabsContent value="byStudent" className="overflow-x-auto">
+        )}
+        {activeTab === 'byStudent' && (
           <Table>
             <TableHeader>
               <TableRow>
@@ -225,8 +252,8 @@ export default function SharePage() {
               ))}
             </TableBody>
           </Table>
-        </TabsContent>
-      </Tabs>
+        )}
+      </div>
     </div>
   )
 }

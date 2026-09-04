@@ -42,11 +42,12 @@ Deno.serve(async (req: Request) => {
 
   const ensembleFilter = link.scope === 'single_ensemble' ? link.ensemble_id : ensembleParam
 
-  const { data: ensembles } = await supabase.from('ensembles').select('id, name')
+  const { data: ensembles } = await supabase.from('ensembles').select('id, name').eq('owner_id', link.owner_id)
 
   let sessionQuery = supabase
     .from('sessions')
     .select('id, date, start_time, kind, title, status, cancel_reason, session_ensembles!inner(ensemble_id)')
+    .eq('owner_id', link.owner_id)
     .order('date', { ascending: false })
     .order('created_at', { ascending: false })
     .limit(1001)
@@ -92,7 +93,11 @@ Deno.serve(async (req: Request) => {
   ;(attendanceRows ?? []).forEach((a) => studentIds.add(a.student_id))
 
   const { data: studentRows } = studentIds.size
-    ? await supabase.from('students').select('id, first_name, last_name, instrument, grade').in('id', [...studentIds])
+    ? await supabase
+        .from('students')
+        .select('id, first_name, last_name, instrument, grade')
+        .eq('owner_id', link.owner_id)
+        .in('id', [...studentIds])
     : { data: [] as { id: string; first_name: string; last_name: string; instrument: string | null; grade: string | null }[] }
 
   const attendanceBySession = new Map<string, { student_id: string; status: string }[]>()

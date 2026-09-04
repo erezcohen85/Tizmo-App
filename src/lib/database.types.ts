@@ -7,6 +7,8 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
@@ -85,6 +87,7 @@ export type Database = {
           id: string
           location: string | null
           name: string
+          owner_id: string
           season_end: string | null
           season_start: string | null
           sort_order: number
@@ -97,6 +100,7 @@ export type Database = {
           id?: string
           location?: string | null
           name: string
+          owner_id?: string
           season_end?: string | null
           season_start?: string | null
           sort_order?: number
@@ -109,10 +113,41 @@ export type Database = {
           id?: string
           location?: string | null
           name?: string
+          owner_id?: string
           season_end?: string | null
           season_start?: string | null
           sort_order?: number
           start_time?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          marketing_opt_in: boolean
+          marketing_opt_in_at: string | null
+          terms_accepted_at: string | null
+          terms_version: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id: string
+          marketing_opt_in?: boolean
+          marketing_opt_in_at?: string | null
+          terms_accepted_at?: string | null
+          terms_version?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          marketing_opt_in?: boolean
+          marketing_opt_in_at?: string | null
+          terms_accepted_at?: string | null
+          terms_version?: string | null
         }
         Relationships: []
       }
@@ -160,6 +195,7 @@ export type Database = {
           date: string
           id: string
           kind: Database["public"]["Enums"]["session_kind"]
+          owner_id: string
           rehearsal_note: string | null
           start_time: string | null
           status: Database["public"]["Enums"]["session_status"]
@@ -172,6 +208,7 @@ export type Database = {
           date: string
           id?: string
           kind: Database["public"]["Enums"]["session_kind"]
+          owner_id?: string
           rehearsal_note?: string | null
           start_time?: string | null
           status?: Database["public"]["Enums"]["session_status"]
@@ -184,6 +221,7 @@ export type Database = {
           date?: string
           id?: string
           kind?: Database["public"]["Enums"]["session_kind"]
+          owner_id?: string
           rehearsal_note?: string | null
           start_time?: string | null
           status?: Database["public"]["Enums"]["session_status"]
@@ -197,6 +235,7 @@ export type Database = {
           ensemble_id: string | null
           id: string
           label: string | null
+          owner_id: string
           revoked: boolean
           scope: Database["public"]["Enums"]["share_scope"]
           token: string
@@ -206,6 +245,7 @@ export type Database = {
           ensemble_id?: string | null
           id?: string
           label?: string | null
+          owner_id?: string
           revoked?: boolean
           scope: Database["public"]["Enums"]["share_scope"]
           token?: string
@@ -215,6 +255,7 @@ export type Database = {
           ensemble_id?: string | null
           id?: string
           label?: string | null
+          owner_id?: string
           revoked?: boolean
           scope?: Database["public"]["Enums"]["share_scope"]
           token?: string
@@ -273,6 +314,7 @@ export type Database = {
           id: string
           instrument: string | null
           last_name: string
+          owner_id: string
         }
         Insert: {
           created_at?: string
@@ -281,6 +323,7 @@ export type Database = {
           id?: string
           instrument?: string | null
           last_name: string
+          owner_id?: string
         }
         Update: {
           created_at?: string
@@ -289,6 +332,7 @@ export type Database = {
           id?: string
           instrument?: string | null
           last_name?: string
+          owner_id?: string
         }
         Relationships: []
       }
@@ -306,17 +350,13 @@ export type Database = {
         }
         Returns: number
       }
-      set_ensemble_weekdays: {
-        Args: { p_ensemble_id: string; p_weekdays: number[] }
-        Returns: undefined
-      }
       create_session: {
         Args: {
           p_date: string
           p_ensemble_ids: string[]
           p_kind: Database["public"]["Enums"]["session_kind"]
-          p_start_time: string | null
-          p_title: string | null
+          p_start_time: string
+          p_title: string
         }
         Returns: {
           cancel_note: string | null
@@ -325,10 +365,17 @@ export type Database = {
           date: string
           id: string
           kind: Database["public"]["Enums"]["session_kind"]
+          owner_id: string
           rehearsal_note: string | null
           start_time: string | null
           status: Database["public"]["Enums"]["session_status"]
           title: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "sessions"
+          isOneToOne: true
+          isSetofReturn: false
         }
       }
       get_or_create_rehearsal: {
@@ -340,10 +387,17 @@ export type Database = {
           date: string
           id: string
           kind: Database["public"]["Enums"]["session_kind"]
+          owner_id: string
           rehearsal_note: string | null
           start_time: string | null
           status: Database["public"]["Enums"]["session_status"]
           title: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "sessions"
+          isOneToOne: true
+          isSetofReturn: false
         }
       }
       import_students: {
@@ -359,7 +413,18 @@ export type Database = {
           id: string
           instrument: string | null
           last_name: string
+          owner_id: string
         }[]
+        SetofOptions: {
+          from: "*"
+          to: "students"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      set_ensemble_weekdays: {
+        Args: { p_ensemble_id: string; p_weekdays: number[] }
+        Returns: undefined
       }
       set_session_ensembles: {
         Args: { p_ensemble_ids: string[]; p_session_id: string }
@@ -386,19 +451,121 @@ export type Database = {
 }
 
 type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
-type DefaultSchema = DatabaseWithoutInternals["public"]
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
-  T extends keyof (DefaultSchema["Tables"] & DefaultSchema["Views"]),
-> = (DefaultSchema["Tables"] & DefaultSchema["Views"])[T] extends { Row: infer R } ? R : never
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
 
-export type TablesInsert<T extends keyof DefaultSchema["Tables"]> =
-  DefaultSchema["Tables"][T] extends { Insert: infer I } ? I : never
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
 
-export type TablesUpdate<T extends keyof DefaultSchema["Tables"]> =
-  DefaultSchema["Tables"][T] extends { Update: infer U } ? U : never
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
 
-export type Enums<T extends keyof DefaultSchema["Enums"]> = DefaultSchema["Enums"][T]
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
 
 export const Constants = {
   public: {
@@ -413,7 +580,7 @@ export const Constants = {
         "concert",
         "other",
       ],
-      session_status: ["held", "canceled"],
+      session_status: ["scheduled", "held", "canceled"],
       share_scope: ["all", "single_ensemble"],
     },
   },

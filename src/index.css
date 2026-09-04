@@ -171,4 +171,12 @@
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }
+  .autofill-bare:-webkit-autofill,
+  .autofill-bare:-webkit-autofill:hover,
+  .autofill-bare:-webkit-autofill:focus {
+    -webkit-text-fill-color: hsl(var(--score));
+    -webkit-box-shadow: 0 0 0px 1000px hsl(var(--stage)) inset;
+    box-shadow: 0 0 0px 1000px hsl(var(--stage)) inset;
+    transition: background-color 9999s ease-in-out 0s;
+  }
 }

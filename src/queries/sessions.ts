@@ -102,8 +102,8 @@ export function useCreateSession() {
       const { data, error } = await supabase.rpc('create_session', {
         p_date: input.date,
         p_kind: input.kind,
-        p_title: input.title,
-        p_start_time: input.start_time,
+        p_title: input.title as string,
+        p_start_time: input.start_time as string,
         p_ensemble_ids: input.ensemble_ids,
       })
       if (error) throw error
