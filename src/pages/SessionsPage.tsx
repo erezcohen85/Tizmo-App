@@ -41,6 +41,7 @@ export default function SessionsPage() {
   const [state, setState] = useState<DisplayState | undefined>(undefined)
   const [from, setFrom] = useState(() => shiftISODate(todayISO(), -60))
   const [to, setTo] = useState(() => shiftISODate(todayISO(), 60))
+  const [sortDir, setSortDir] = useState<'newOld' | 'oldNew'>('newOld')
 
   const { data: sessions } = useSessionsInRange(from, to, ensembleId)
 
@@ -49,7 +50,8 @@ export default function SessionsPage() {
     return (sessions ?? [])
       .filter((s) => !kind || s.kind === kind)
       .filter((s) => !state || displayState(s.status, s.date, today) === state)
-  }, [sessions, kind, state])
+      .sort((a, b) => (sortDir === 'newOld' ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date)))
+  }, [sessions, kind, state, sortDir])
 
   const sessionIds = useMemo(() => filtered.map((s) => s.id), [filtered])
   const { data: attendanceRows } = useAttendanceForSessions(sessionIds)
@@ -125,6 +127,16 @@ export default function SessionsPage() {
                 {t(`sessionStatuses.${s}` as never)}
               </SelectItem>
             ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={sortDir} onValueChange={(v) => setSortDir(v as 'newOld' | 'oldNew')}>
+          <SelectTrigger className="h-auto w-auto gap-1 border-0 bg-transparent p-0 text-[12.5px] font-light text-dim shadow-none focus:ring-0">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="newOld">{t('sessions.sortNewOld')}</SelectItem>
+            <SelectItem value="oldNew">{t('sessions.sortOldNew')}</SelectItem>
           </SelectContent>
         </Select>
 

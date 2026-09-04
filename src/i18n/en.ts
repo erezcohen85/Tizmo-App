@@ -118,7 +118,7 @@ const en = {
     startTime: 'Start time',
     ensembles: 'Ensembles',
   },
-  sessions: { new: 'New event', allTypes: 'All session types' },
+  sessions: { new: 'New event', allTypes: 'All session types', sortNewOld: 'Newest first', sortOldNew: 'Oldest first' },
   manage: {
     tabEnsembles: 'Ensembles',
     tabStudents: 'Students',

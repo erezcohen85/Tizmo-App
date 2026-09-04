@@ -120,7 +120,7 @@ const he: Dict = {
     startTime: 'שעת התחלה',
     ensembles: 'תזמורות',
   },
-  sessions: { new: 'אירוע חדש', allTypes: 'כל סוגי המפגשים' },
+  sessions: { new: 'אירוע חדש', allTypes: 'כל סוגי המפגשים', sortNewOld: 'החדש ביותר', sortOldNew: 'הישן ביותר' },
   manage: {
     tabEnsembles: 'תזמורות',
     tabStudents: 'תלמידים',
