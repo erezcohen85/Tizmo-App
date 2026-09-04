@@ -35,6 +35,13 @@ There is no local Supabase stack. The app talks to the hosted project `band-atte
 
 The DB stores `scheduled | held | canceled`. The UI shows four states: a `scheduled` session reads as **Future** if its date is ahead, **Needs entry** once past. `displayState()` in `src/lib/sessionState.ts` is the single source of that mapping — use it everywhere rather than reading `status` directly. A database trigger promotes `scheduled → held` whenever an attendance row is written, so client code should not set `held` manually after marking attendance.
 
+## Visual direction
+
+`design/UI-SPEC.md` is the approved UI direction ("the quiet before the downbeat") and **overrides
+the current shadcn defaults** in `src/index.css` / `tailwind.config.js`. Read it before any visual
+change. The current app predates it; migrating screens to the spec is expected, not a regression.
+Its interactive reference is the artifact "Tutti Before the Downbeat" (`/artifacts`).
+
 ## Frontend conventions
 
 - **Reads/writes**: TanStack Query hooks live in `src/queries/*`, one file per domain. Query keys in use: `['ensembles']`, `['students']`, `['memberships']`, `['sessions', {...}]`, `['sessionDates', ensembleId]`, `['roster', id]`, `['attendance', id]`, `['shareLinks']`. Session mutations must invalidate **both** `['sessions']` and `['sessionDates']` (the latter drives the attendance date-skip nav).

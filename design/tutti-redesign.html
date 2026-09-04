@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tutti — Score &amp; Brass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFF1EE;
+    --raised:#F7F8F6;
+    --ink:#101B2D;
+    --ink-soft:#5A6577;
+    --staff:#C9CEC8;
+    --brass:#A87A2C;
+    --felt:#16302E;
+    --present:#2F6B4F;
+    --absent:#A32C2C;
+    --late:#B07A18;
+    --excused:#3E5C76;
+
+    --e-municipal:#7C4DBE;
+    --e-youth:#C8452F;
+    --e-brass:#C79A2B;
+    --e-sax:#1E8A73;
+
+    --display:"Frank Ruhl Libre", Georgia, serif;
+    --ui:"Heebo", system-ui, sans-serif;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:#DCE0DA; color:var(--ink);
+    font-family:var(--ui); -webkit-font-smoothing:antialiased;
+    padding:40px 24px 64px;
+  }
+
+  .sheet-title{
+    font-family:var(--display); font-weight:500; font-size:26px;
+    margin:0 0 4px; letter-spacing:-0.01em;
+  }
+  .sheet-sub{ font-size:14px; color:#4A5566; margin:0 0 32px; max-width:60ch; line-height:1.6 }
+
+  .frames{ display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap }
+  .frame{
+    width:390px; background:var(--paper); border:1px solid #B9BFB6;
+    border-radius:6px; overflow:hidden; position:relative;
+  }
+  .frame-label{
+    font-size:12px; color:#4A5566; margin:0 0 8px; font-weight:500;
+  }
+  .col{ display:flex; flex-direction:column }
+
+  /* ---------- shared chrome ---------- */
+  .appbar{
+    display:flex; align-items:center; gap:10px;
+    padding:14px 16px; background:var(--raised);
+    border-bottom:1px solid var(--staff);
+  }
+  .wordmark{ font-family:var(--display); font-weight:700; font-size:19px; letter-spacing:-0.01em }
+  .wordmark small{ font-family:var(--ui); font-weight:400; font-size:11px; color:var(--ink-soft); margin-inline-start:6px }
+
+  .tabbar{
+    display:flex; border-top:1px solid var(--staff); background:var(--raised);
+  }
+  .tabbar div{
+    flex:1; text-align:center; padding:9px 0 11px; font-size:11px; color:var(--ink-soft);
+  }
+  .tabbar div.on{ color:var(--ink); font-weight:500; box-shadow:inset 0 2px 0 var(--ink) }
+
+  /* ---------- home ---------- */
+  .filterrow{
+    display:flex; align-items:center; gap:8px; padding:12px 16px 10px;
+  }
+  .chip{
+    font-size:12px; padding:5px 10px; border:1px solid var(--staff);
+    background:transparent; color:var(--ink-soft); border-radius:3px;
+  }
+  .chip.on{ background:var(--ink); color:var(--paper); border-color:var(--ink) }
+  .chip.today{ background:var(--brass); border-color:var(--brass); color:#fff; font-weight:500 }
+
+  .band{
+    padding:6px 16px 8px; font-size:12px; color:var(--ink-soft);
+    display:flex; align-items:baseline; gap:8px;
+  }
+  .band b{ font-family:var(--display); font-size:15px; font-weight:700; color:var(--ink) }
+  .band .rule{ flex:1; height:1px; background:var(--staff) }
+
+  .ens{
+    display:flex; gap:12px; padding:14px 16px 14px 12px;
+    border-bottom:1px solid var(--staff); background:var(--paper);
+    position:relative;
+  }
+  .ens .spine{ width:4px; border-radius:2px; flex:0 0 4px }
+  .ens .body{ flex:1; min-width:0 }
+  .ens h3{
+    font-family:var(--display); font-weight:700; font-size:20px; margin:0 0 6px;
+    letter-spacing:-0.01em; line-height:1.15;
+  }
+  .week{ display:flex; gap:3px; margin:0 0 7px }
+  .week span{
+    width:19px; height:19px; display:grid; place-items:center;
+    font-size:10px; color:#8C9490; border:1px solid var(--staff); border-radius:2px;
+  }
+  .week span.on{ background:var(--ink); border-color:var(--ink); color:var(--paper); font-weight:500 }
+  .meta{ font-size:12.5px; color:var(--ink-soft) }
+  .meta b{ color:var(--ink); font-weight:500 }
+  .flag{
+    font-size:11px; color:#fff; background:var(--brass);
+    padding:3px 7px; border-radius:2px; align-self:flex-start; font-weight:500;
+    white-space:nowrap;
+  }
+  .kebab{ color:#9AA29C; font-size:17px; line-height:1; padding-top:2px }
+
+  /* ---------- attendance ---------- */
+  .ensbar{
+    display:flex; align-items:center; gap:10px; padding:12px 16px;
+    background:var(--raised); border-bottom:1px solid var(--staff);
+    border-inline-start:4px solid var(--e-municipal);
+  }
+  .ensbar h2{ font-family:var(--display); font-size:19px; font-weight:700; margin:0; letter-spacing:-0.01em }
+  .ensbar .back{ color:var(--ink-soft); font-size:15px }
+
+  .session{
+    display:flex; align-items:center; gap:11px; padding:12px 16px;
+    border-bottom:1px solid var(--staff);
+  }
+  .mark{
+    width:44px; height:44px; flex:0 0 44px; display:grid; place-items:center;
+    border:2px solid var(--ink); border-radius:3px;
+    font-family:var(--display); font-size:20px; font-weight:700;
+  }
+  .mark.pending{ background:var(--brass); border-color:var(--brass); color:#fff }
+  .session .txt{ flex:1; min-width:0 }
+  .session .state{ font-size:13.5px; font-weight:500 }
+  .session .when{ font-size:12px; color:var(--ink-soft); margin-top:1px }
+  .session .arrows{ color:#9AA29C; font-size:13px; letter-spacing:6px }
+
+  .count{
+    padding:16px 16px 12px;
+  }
+  .count .line{ display:flex; align-items:baseline; justify-content:space-between; gap:12px }
+  .count .num{ font-family:var(--display); font-size:40px; font-weight:700; line-height:1; letter-spacing:-0.02em }
+  .count .num i{ font-style:normal; font-size:17px; font-weight:400; color:var(--ink-soft); margin-inline-start:4px }
+  .count .allpresent{ font-size:12.5px; color:var(--ink-soft); border-bottom:1px solid var(--staff); padding-bottom:1px }
+  .progress{ height:4px; background:var(--staff); margin-top:11px; border-radius:2px; overflow:hidden }
+  .progress i{ display:block; height:100%; background:var(--e-municipal); width:80% }
+
+  .stave{ border-top:1px solid var(--staff) }
+  .row{
+    display:flex; align-items:center; gap:10px; padding:9px 16px 9px 10px;
+    border-bottom:1px solid var(--staff); min-height:64px;
+  }
+  .row.todo{ background:var(--raised) }
+  .row .tick{ width:3px; height:30px; border-radius:2px; flex:0 0 3px }
+  .row .who{ flex:1; min-width:0 }
+  .row .name{ font-family:var(--display); font-size:18px; font-weight:500; line-height:1.2 }
+  .row .inst{ font-size:12px; color:var(--ink-soft); margin-top:2px }
+  .marks{ display:flex; flex:0 0 auto; border:1px solid var(--staff); border-radius:3px; overflow:hidden }
+  .marks b{
+    width:38px; height:38px; display:grid; place-items:center; font-weight:400;
+    border-inline-start:1px solid var(--staff); color:#98A09A; font-size:15px;
+  }
+  .marks b:first-child{ border-inline-start:0 }
+  .marks b.p{ background:var(--present); color:#fff }
+  .marks b.a{ background:var(--absent); color:#fff }
+  .marks b.l{ background:var(--late); color:#fff }
+  .marks b.e{ background:var(--excused); color:#fff }
+
+  .bottombar{
+    display:flex; gap:8px; padding:10px 16px 12px; background:var(--raised);
+    border-top:1px solid var(--staff);
+  }
+  .btn{
+    font-size:13px; padding:9px 12px; border:1px solid var(--staff);
+    border-radius:3px; color:var(--ink); background:transparent;
+  }
+  .btn.grow{ flex:1; color:var(--ink-soft) }
+
+  /* ---------- sessions ---------- */
+  .filters{ padding:12px 16px; display:flex; flex-wrap:wrap; gap:6px; border-bottom:1px solid var(--staff) }
+  .month{
+    font-family:var(--display); font-size:14px; font-weight:700;
+    padding:14px 16px 6px; display:flex; align-items:baseline; gap:8px;
+  }
+  .month .rule{ flex:1; height:1px; background:var(--staff) }
+  .month span{ font-family:var(--ui); font-weight:400; font-size:11.5px; color:var(--ink-soft) }
+
+  .sess{
+    display:flex; gap:12px; padding:11px 16px; border-bottom:1px solid var(--staff);
+    align-items:flex-start;
+  }
+  .rail{ flex:0 0 42px; text-align:center; padding-top:2px }
+  .rail .d{ font-family:var(--display); font-size:20px; font-weight:700; line-height:1 }
+  .rail .w{ font-size:10.5px; color:var(--ink-soft); margin-top:2px }
+  .sess .info{ flex:1; min-width:0 }
+  .sess .title{ font-size:14.5px; font-weight:500; line-height:1.25 }
+  .sess .sub{ font-size:12px; color:var(--ink-soft); margin-top:3px; display:flex; align-items:center; gap:6px }
+  .swatch{ width:9px; height:9px; border-radius:2px; flex:0 0 9px }
+  .smark{
+    width:26px; height:26px; flex:0 0 26px; display:grid; place-items:center;
+    border:1.5px solid var(--staff); border-radius:3px; font-size:12px; color:#98A09A;
+    font-family:var(--display); font-weight:700; margin-top:2px;
+  }
+  .smark.held{ background:var(--present); border-color:var(--present); color:#fff }
+  .smark.pending{ background:var(--brass); border-color:var(--brass); color:#fff }
+  .smark.cancel{ background:transparent; border-color:var(--absent); color:var(--absent) }
+  .attend{ font-size:12px; color:var(--ink-soft); font-variant-numeric:tabular-nums; padding-top:3px }
+</style>
+</head>
+<body>
+
+<h1 class="sheet-title">Tutti — הצעת עיצוב</h1>
+<p class="sheet-sub">Score &amp; Brass: נייר תווים קריר, דיו כחול־כהה, פליז לסימון "דורש טיפול", וצבע ההרכב כזהות. סימני חזרה מרובעים במקום תגיות, ושורות תלמידים כמו חמשה — לא כרטיסים.</p>
+
+<div class="frames">
+
+  <!-- ============ HOME ============ -->
+  <div class="col">
+    <p class="frame-label">בית — ההרכבים</p>
+    <div class="frame">
+      <div class="appbar"><span class="wordmark">Tutti <small>נוכחות</small></span></div>
+
+      <div class="filterrow">
+        <span class="chip today">היום</span>
+        <span class="chip">כל הימים</span>
+        <span class="chip">הסדר שלי</span>
+      </div>
+
+      <div class="band"><b>היום, יום שני</b><span class="rule"></span><span>2 חזרות</span></div>
+
+      <div class="ens">
+        <div class="spine" style="background:var(--e-youth)"></div>
+        <div class="body">
+          <h3>צעירה הרצליה</h3>
+          <div class="week">
+            <span>א</span><span class="on">ב</span><span>ג</span><span>ד</span><span>ה</span><span>ו</span><span>ש</span>
+          </div>
+          <div class="meta"><b>16:00</b> — 20 תלמידים</div>
+        </div>
+        <span class="flag">חזרה אחת ממתינה</span>
+        <div class="kebab">⋮</div>
+      </div>
+
+      <div class="ens">
+        <div class="spine" style="background:var(--e-municipal)"></div>
+        <div class="body">
+          <h3>עירונית הרצליה</h3>
+          <div class="week">
+            <span>א</span><span class="on">ב</span><span>ג</span><span>ד</span><span class="on">ה</span><span>ו</span><span>ש</span>
+          </div>
+          <div class="meta"><b>18:00</b> — 35 תלמידים</div>
+        </div>
+        <div class="kebab">⋮</div>
+      </div>
+
+      <div class="band"><b>בהמשך השבוע</b><span class="rule"></span></div>
+
+      <div class="ens">
+        <div class="spine" style="background:var(--e-brass)"></div>
+        <div class="body">
+          <h3>חמישיית מתכת</h3>
+          <div class="week">
+            <span>א</span><span>ב</span><span>ג</span><span class="on">ד</span><span>ה</span><span>ו</span><span>ש</span>
+          </div>
+          <div class="meta"><b>20:00</b> — 5 תלמידים</div>
+        </div>
+        <div class="kebab">⋮</div>
+      </div>
+
+      <div class="ens">
+        <div class="spine" style="background:var(--e-sax)"></div>
+        <div class="body">
+          <h3>קווארטט סקסופונים</h3>
+          <div class="week">
+            <span>א</span><span>ב</span><span>ג</span><span>ד</span><span class="on">ה</span><span>ו</span><span>ש</span>
+          </div>
+          <div class="meta"><b>17:00</b> — 4 תלמידים</div>
+        </div>
+        <div class="kebab">⋮</div>
+      </div>
+
+      <div class="bottombar">
+        <button class="btn">הרכב חדש</button>
+        <button class="btn grow">שיתוף כל ההרכבים</button>
+      </div>
+
+      <div class="tabbar">
+        <div class="on">בית</div><div>מפגשים</div><div>תלמידים</div><div>הגדרות</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ATTENDANCE ============ -->
+  <div class="col">
+    <p class="frame-label">נוכחות — המסך שנמצא בו רוב הזמן</p>
+    <div class="frame">
+      <div class="ensbar">
+        <span class="back">›</span>
+        <h2>עירונית הרצליה</h2>
+        <span class="back">⌄</span>
+      </div>
+
+      <div class="session">
+        <div class="mark pending">ג</div>
+        <div class="txt">
+          <div class="state">ממתין למילוי</div>
+          <div class="when">יום שני, 7 בספטמבר, 18:00</div>
+        </div>
+        <div class="arrows">‹›</div>
+      </div>
+
+      <div class="count">
+        <div class="line">
+          <div class="num">28<i>מתוך 35</i></div>
+          <div class="allpresent">סמן הכל כנוכח</div>
+        </div>
+        <div class="progress"><i></i></div>
+      </div>
+
+      <div class="stave">
+        <div class="row">
+          <div class="tick" style="background:var(--e-sax)"></div>
+          <div class="who"><div class="name">נועה בן־ארי</div><div class="inst">חליל צד</div></div>
+          <div class="marks"><b class="p">✓</b><b>✕</b><b>◔</b><b>⛉</b></div>
+        </div>
+        <div class="row">
+          <div class="tick" style="background:var(--e-sax)"></div>
+          <div class="who"><div class="name">איתי רוזנברג</div><div class="inst">קלרינט</div></div>
+          <div class="marks"><b class="p">✓</b><b>✕</b><b>◔</b><b>⛉</b></div>
+        </div>
+        <div class="row">
+          <div class="tick" style="background:var(--e-sax)"></div>
+          <div class="who"><div class="name">שירה כהן</div><div class="inst">סקסופון</div></div>
+          <div class="marks"><b>✓</b><b class="a">✕</b><b>◔</b><b>⛉</b></div>
+        </div>
+        <div class="row">
+          <div class="tick" style="background:var(--e-brass)"></div>
+          <div class="who"><div class="name">יונתן לוי</div><div class="inst">טרומבון</div></div>
+          <div class="marks"><b class="p">✓</b><b>✕</b><b>◔</b><b>⛉</b></div>
+        </div>
+        <div class="row">
+          <div class="tick" style="background:var(--e-youth)"></div>
+          <div class="who"><div class="name">מאיה אברהם</div><div class="inst">תופים</div></div>
+          <div class="marks"><b>✓</b><b>✕</b><b class="l">◔</b><b>⛉</b></div>
+        </div>
+        <div class="row">
+          <div class="tick" style="background:var(--e-sax)"></div>
+          <div class="who"><div class="name">דניאל שפירא</div><div class="inst">אבוב</div></div>
+          <div class="marks"><b class="p">✓</b><b>✕</b><b>◔</b><b>⛉</b></div>
+        </div>
+        <div class="row todo">
+          <div class="tick" style="background:var(--e-brass)"></div>
+          <div class="who"><div class="name">תמר גולן</div><div class="inst">בריטון</div></div>
+          <div class="marks"><b>✓</b><b>✕</b><b>◔</b><b>⛉</b></div>
+        </div>
+        <div class="row todo">
+          <div class="tick" style="background:var(--e-sax)"></div>
+          <div class="who"><div class="name">עומר פרידמן</div><div class="inst">קלרינט</div></div>
+          <div class="marks"><b>✓</b><b>✕</b><b>◔</b><b>⛉</b></div>
+        </div>
+      </div>
+
+      <div class="bottombar">
+        <button class="btn">הוסף תלמיד/ה</button>
+        <button class="btn grow">הערה לחזרה</button>
+      </div>
+
+      <div class="tabbar">
+        <div>בית</div><div>מפגשים</div><div>תלמידים</div><div>הגדרות</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SESSIONS ============ -->
+  <div class="col">
+    <p class="frame-label">מפגשים — סינון והיסטוריה</p>
+    <div class="frame">
+      <div class="appbar"><span class="wordmark">מפגשים</span></div>
+
+      <div class="filters">
+        <span class="chip on">ממתין למילוי</span>
+        <span class="chip">כל ההרכבים</span>
+        <span class="chip">כל הסוגים</span>
+        <span class="chip">ספטמבר</span>
+      </div>
+
+      <div class="month">ספטמבר 2026<span class="rule"></span><span>14 מפגשים</span></div>
+
+      <div class="sess">
+        <div class="rail"><div class="d">7</div><div class="w">שני</div></div>
+        <div class="info">
+          <div class="title">חזרה</div>
+          <div class="sub"><i class="swatch" style="background:var(--e-municipal)"></i>עירונית הרצליה</div>
+        </div>
+        <div class="attend">—</div>
+        <div class="smark pending">ג</div>
+      </div>
+
+      <div class="sess">
+        <div class="rail"><div class="d">7</div><div class="w">שני</div></div>
+        <div class="info">
+          <div class="title">חזרה</div>
+          <div class="sub"><i class="swatch" style="background:var(--e-youth)"></i>צעירה הרצליה</div>
+        </div>
+        <div class="attend">18/20</div>
+        <div class="smark held">ב</div>
+      </div>
+
+      <div class="sess">
+        <div class="rail"><div class="d">4</div><div class="w">שישי</div></div>
+        <div class="info">
+          <div class="title">קונצרט פתיחת עונה</div>
+          <div class="sub">
+            <i class="swatch" style="background:var(--e-municipal)"></i>עירונית
+            <i class="swatch" style="background:var(--e-youth)"></i>צעירה
+          </div>
+        </div>
+        <div class="attend">52/55</div>
+        <div class="smark held">א</div>
+      </div>
+
+      <div class="sess">
+        <div class="rail"><div class="d">2</div><div class="w">רביעי</div></div>
+        <div class="info">
+          <div class="title">חזרה</div>
+          <div class="sub"><i class="swatch" style="background:var(--e-brass)"></i>חמישיית מתכת</div>
+        </div>
+        <div class="attend">בוטל — חג</div>
+        <div class="smark cancel">✕</div>
+      </div>
+
+      <div class="month">אוגוסט 2026<span class="rule"></span><span>9 מפגשים</span></div>
+
+      <div class="sess">
+        <div class="rail"><div class="d">31</div><div class="w">שני</div></div>
+        <div class="info">
+          <div class="title">חזרה</div>
+          <div class="sub"><i class="swatch" style="background:var(--e-municipal)"></i>עירונית הרצליה</div>
+        </div>
+        <div class="attend">33/35</div>
+        <div class="smark held">ב</div>
+      </div>
+
+      <div class="sess">
+        <div class="rail"><div class="d">27</div><div class="w">חמישי</div></div>
+        <div class="info">
+          <div class="title">מבחן כיסאות</div>
+          <div class="sub"><i class="swatch" style="background:var(--e-sax)"></i>קווארטט סקסופונים</div>
+        </div>
+        <div class="attend">4/4</div>
+        <div class="smark held">א</div>
+      </div>
+
+      <div class="bottombar">
+        <button class="btn">אירוע חדש</button>
+        <button class="btn grow">ייצוא</button>
+      </div>
+
+      <div class="tabbar">
+        <div>בית</div><div class="on">מפגשים</div><div>תלמידים</div><div>הגדרות</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
