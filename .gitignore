@@ -28,3 +28,6 @@ ADMIN_SECRET.txt
 
 # Supabase CLI scratch
 supabase/.temp/
+
+# Stitch downloads
+.stitch/
