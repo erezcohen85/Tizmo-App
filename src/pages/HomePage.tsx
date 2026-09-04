@@ -166,22 +166,26 @@ export default function HomePage() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <Button size="sm" onClick={openCreate}>
-          <Plus className="size-4" />
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-ui text-[12.5px] font-light">
+        <button type="button" onClick={openCreate} className="inline-flex items-center gap-1.5 text-dim transition-colors hover:text-lamp">
+          <Plus className="size-3.5" strokeWidth={1.4} />
           {t('home.newEnsemble')}
-        </Button>
-        <Button variant="outline" size="sm" onClick={() => setShareAllOpen(true)}>
-          <Share2 className="size-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => setShareAllOpen(true)}
+          className="inline-flex items-center gap-1.5 text-dim transition-colors hover:text-lamp"
+        >
+          <Share2 className="size-3.5" strokeWidth={1.4} />
           {t('home.shareAll')}
-        </Button>
+        </button>
 
         <Select
           value={dayFilter === undefined ? '__all__' : String(dayFilter)}
           onValueChange={(v) => setDayFilter(v === '__all__' ? undefined : Number(v))}
         >
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="h-auto w-auto gap-1 border-0 bg-transparent p-0 text-[12.5px] font-light text-dim shadow-none focus:ring-0">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -194,17 +198,16 @@ export default function HomePage() {
           </SelectContent>
         </Select>
 
-        <Button
-          variant={dayFilter === todayWeekday ? 'default' : 'outline'}
-          size="sm"
+        <button
+          type="button"
           onClick={() => setDayFilter(dayFilter === todayWeekday ? undefined : todayWeekday)}
-          className="border-pink-600 bg-pink-600 text-white hover:bg-pink-700 hover:text-white"
+          className={cn('transition-colors', dayFilter === todayWeekday ? 'text-lamp' : 'text-dim hover:text-lamp')}
         >
           {t('home.today')}
-        </Button>
+        </button>
 
         <Select value={sortMode} onValueChange={(v) => changeSort(v as SortMode)}>
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="h-auto w-auto gap-1 border-0 bg-transparent p-0 text-[12.5px] font-light text-dim shadow-none focus:ring-0">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -214,24 +217,24 @@ export default function HomePage() {
           </SelectContent>
         </Select>
 
-        <div className="ms-auto flex overflow-hidden rounded-md border">
+        <div className="ms-auto flex items-center gap-3">
           <button
             type="button"
             aria-label={t('home.viewCards')}
             title={t('home.viewCards')}
             onClick={() => changeView('cards')}
-            className={view === 'cards' ? 'bg-primary p-2 text-primary-foreground' : 'p-2 text-muted-foreground'}
+            className={view === 'cards' ? 'text-lamp' : 'text-faint hover:text-dim'}
           >
-            <LayoutGrid className="size-4" />
+            <LayoutGrid className="size-4" strokeWidth={1.4} />
           </button>
           <button
             type="button"
             aria-label={t('home.viewList')}
             title={t('home.viewList')}
             onClick={() => changeView('list')}
-            className={view === 'list' ? 'bg-primary p-2 text-primary-foreground' : 'p-2 text-muted-foreground'}
+            className={view === 'list' ? 'text-lamp' : 'text-faint hover:text-dim'}
           >
-            <List className="size-4" />
+            <List className="size-4" strokeWidth={1.4} />
           </button>
         </div>
       </div>
@@ -252,83 +255,57 @@ export default function HomePage() {
           }
         />
       ) : view === 'cards' ? (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-x-8 gap-y-1 sm:grid-cols-2 lg:grid-cols-3">
           {visible.map((e, index) => {
             const { memberCount, next, needsEntry } = statsFor(e)
             return (
               <div
                 key={e.id}
                 {...dragProps(e.id)}
-                className={cn(
-                  'relative rounded-lg border border-s-4 p-4 transition-colors hover:bg-accent/40',
-                  canDrag && 'cursor-grab',
-                  dragId === e.id && 'opacity-50',
-                )}
-                style={{ borderInlineStartColor: e.color }}
+                className={cn('relative py-3.5 shadow-separator', canDrag && 'cursor-grab', dragId === e.id && 'opacity-50')}
               >
-                <div className="absolute end-2 top-2 flex items-center">
-                  {canDrag && <GripVertical className="size-4 text-muted-foreground" aria-label={t('home.dragHint')} />}
+                <div className="absolute end-0 top-3 flex items-center">
+                  {canDrag && <GripVertical className="size-3.5 text-faint" aria-label={t('home.dragHint')} />}
                   <EnsembleMenu e={e} index={index} />
                 </div>
 
-                <Link to={`/ensemble/${e.id}`} className="block space-y-1 pe-14">
-                  <p className="font-semibold">{e.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {e.weekdays.map((d) => t(weekdayKey(d) as never)).join(', ')} · {e.start_time.slice(0, 5)}
+                <Link to={`/ensemble/${e.id}`} className="block pe-12">
+                  <p className="flex items-center gap-2 text-[15.5px] tracking-[-.005em] text-score">
+                    <EnsembleDot color={e.color} />
+                    {e.name}
+                    {needsEntry > 0 && <span className="size-[5px] rounded-full bg-lamp" aria-label={t('home.needsEntry')} />}
                   </p>
-                  <p className="text-sm text-muted-foreground">
-                    {memberCount} {t('home.students')}
+                  <p className="mt-[3px] text-[11.5px] text-faint">
+                    {e.weekdays.map((d) => t(weekdayKey(d) as never)).join(', ')} · {e.start_time.slice(0, 5)} · {memberCount}{' '}
+                    {t('home.students')}
+                    {next && <> · {t('home.nextSession')} {next.date}</>}
                   </p>
-                  <div className="flex flex-wrap gap-2 pt-1 text-xs">
-                    {next && (
-                      <span className="rounded bg-secondary px-1.5 py-0.5">
-                        {t('home.nextSession')}: {next.date}
-                      </span>
-                    )}
-                    {needsEntry > 0 && (
-                      <span className="rounded bg-amber-500 px-1.5 py-0.5 text-white">
-                        {needsEntry} {t('home.needsEntry')}
-                      </span>
-                    )}
-                  </div>
                 </Link>
               </div>
             )
           })}
         </div>
       ) : (
-        <ul className="divide-y rounded-lg border">
+        <ul>
           {visible.map((e, index) => {
             const { memberCount, next, needsEntry } = statsFor(e)
             return (
               <li
                 key={e.id}
                 {...dragProps(e.id)}
-                className={cn(
-                  'flex flex-wrap items-center gap-3 p-3 hover:bg-accent/40',
-                  canDrag && 'cursor-grab',
-                  dragId === e.id && 'opacity-50',
-                )}
+                className={cn('flex flex-wrap items-center gap-3 py-3.5 shadow-separator', canDrag && 'cursor-grab', dragId === e.id && 'opacity-50')}
               >
-                {canDrag && <GripVertical className="size-4 text-muted-foreground" aria-label={t('home.dragHint')} />}
-                <EnsembleDot color={e.color} className="size-3" />
+                {canDrag && <GripVertical className="size-3.5 text-faint" aria-label={t('home.dragHint')} />}
+                <EnsembleDot color={e.color} />
                 <Link to={`/ensemble/${e.id}`} className="min-w-40 flex-1">
-                  <p className="font-medium">{e.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {e.weekdays.map((d) => t(weekdayKey(d) as never)).join(', ')} · {e.start_time.slice(0, 5)} ·{' '}
-                    {memberCount} {t('home.students')}
+                  <p className="text-[15.5px] tracking-[-.005em] text-score">{e.name}</p>
+                  <p className="mt-[3px] text-[11.5px] text-faint">
+                    {e.weekdays.map((d) => t(weekdayKey(d) as never)).join(', ')} · {e.start_time.slice(0, 5)} · {memberCount}{' '}
+                    {t('home.students')}
+                    {next && <> · {t('home.nextSession')} {next.date}</>}
                   </p>
                 </Link>
-                {next && (
-                  <span className="rounded bg-secondary px-1.5 py-0.5 text-xs">
-                    {t('home.nextSession')}: {next.date}
-                  </span>
-                )}
-                {needsEntry > 0 && (
-                  <span className="rounded bg-amber-500 px-1.5 py-0.5 text-xs text-white">
-                    {needsEntry} {t('home.needsEntry')}
-                  </span>
-                )}
+                {needsEntry > 0 && <span className="size-[5px] rounded-full bg-lamp" aria-label={t('home.needsEntry')} />}
                 <EnsembleMenu e={e} index={index} />
               </li>
             )
