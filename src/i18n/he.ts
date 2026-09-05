@@ -12,6 +12,15 @@ const he: Dict = {
     friday: 'שישי',
     saturday: 'שבת',
   },
+  weekdayLetters: {
+    sunday: 'א',
+    monday: 'ב',
+    tuesday: 'ג',
+    wednesday: 'ד',
+    thursday: 'ה',
+    friday: 'ו',
+    saturday: 'ש',
+  },
   kinds: {
     rehearsal: 'חזרה',
     special_rehearsal: 'חזרה מיוחדת',

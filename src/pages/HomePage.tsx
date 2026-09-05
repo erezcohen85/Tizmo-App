@@ -11,6 +11,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { EmptyState } from '@/components/EmptyState'
 import { EnsembleDot } from '@/components/EnsembleDot'
+import { WeekdayStrip } from '@/components/WeekdayStrip'
 import { EnsembleFormDialog } from '@/components/EnsembleFormDialog'
 import { ShareLinkDialog } from '@/components/ShareLinkDialog'
 import { useI18n } from '@/i18n'
@@ -283,9 +284,9 @@ export default function HomePage() {
                     {e.name}
                     {needsEntry > 0 && <span className="size-[5px] rounded-full bg-lamp" aria-label={t('home.needsEntry')} />}
                   </p>
-                  <p className="mt-[3px] text-[11.5px] text-faint">
-                    {e.weekdays.map((d) => t(weekdayKey(d) as never)).join(', ')} · {e.start_time.slice(0, 5)} · {memberCount}{' '}
-                    {t('home.students')}
+                  <WeekdayStrip days={e.weekdays} className="mt-[7px]" />
+                  <p className="mt-[5px] text-[11.5px] text-faint">
+                    {e.start_time.slice(0, 5)} · {memberCount} {t('home.students')}
                     {next && <> · {t('home.nextSession')} {next.date}</>}
                   </p>
                 </Link>
@@ -307,9 +308,9 @@ export default function HomePage() {
                 <EnsembleDot color={e.color} />
                 <Link to={`/ensemble/${e.id}`} className="min-w-40 flex-1">
                   <p className="text-[15.5px] tracking-[-.005em] text-score">{e.name}</p>
-                  <p className="mt-[3px] text-[11.5px] text-faint">
-                    {e.weekdays.map((d) => t(weekdayKey(d) as never)).join(', ')} · {e.start_time.slice(0, 5)} · {memberCount}{' '}
-                    {t('home.students')}
+                  <WeekdayStrip days={e.weekdays} className="mt-[7px]" />
+                  <p className="mt-[5px] text-[11.5px] text-faint">
+                    {e.start_time.slice(0, 5)} · {memberCount} {t('home.students')}
                     {next && <> · {t('home.nextSession')} {next.date}</>}
                   </p>
                 </Link>

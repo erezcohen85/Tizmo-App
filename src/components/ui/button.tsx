@@ -4,26 +4,32 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Per UI-SPEC §5: "Primary actions in this app are marks, not buttons. Everything else is a
+ * quiet text button: Assistant 300 12.5px at `dim`, no border, no fill, turning `lamp` on
+ * hover. Reserve a bordered button for genuinely destructive confirmation only."
+ *
+ * So there are really only two shapes here — quiet text, and a bordered destructive confirm.
+ * The remaining variant names are kept so call sites don't churn, but they all resolve to the
+ * quiet treatment rather than reintroducing fills.
+ */
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-ui text-[12.5px] font-light transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default:
-          "bg-primary text-primary-foreground shadow hover:bg-primary/90",
+        default: "text-dim hover:text-lamp",
         destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+          "border border-status-absent/40 text-status-absent hover:border-status-absent",
+        outline: "text-dim hover:text-lamp",
+        secondary: "text-dim hover:text-lamp",
+        ghost: "text-dim hover:text-lamp",
+        link: "text-dim underline-offset-4 hover:text-lamp hover:underline",
       },
       size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-8",
+        default: "h-9 px-2 py-2",
+        sm: "h-8 px-2",
+        lg: "h-10 px-3",
         icon: "h-9 w-9",
       },
     },

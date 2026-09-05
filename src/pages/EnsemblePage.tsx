@@ -532,7 +532,7 @@ function OverviewTab({ ensembleId }: { ensembleId: string }) {
         <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="w-40" />
       </div>
 
-      <div className="rounded-lg border">
+      <div>
         <Table>
           <TableHeader>
             <TableRow className="border-b-0">
@@ -548,7 +548,7 @@ function OverviewTab({ ensembleId }: { ensembleId: string }) {
           <TableBody>
             {rows.map(({ student, stats }) => (
               <TableRow key={student.id} className="border-b-0">
-                <TableCell className="font-medium">
+                <TableCell className="font-normal">
                   {student.first_name} {student.last_name}
                 </TableCell>
                 <TableCell className="text-muted-foreground">{student.instrument}</TableCell>
@@ -558,7 +558,7 @@ function OverviewTab({ ensembleId }: { ensembleId: string }) {
                 <TableCell>{stats.late}</TableCell>
                 <TableCell
                   className={cn(
-                    'font-medium',
+                    'font-normal',
                     stats.percentage !== null && stats.percentage < 70 && 'text-destructive',
                   )}
                 >
@@ -660,13 +660,13 @@ function AddStudentDialog({
               onChange={(e) => setSearch(e.target.value)}
               autoFocus
             />
-            <ul className="max-h-64 divide-y overflow-auto rounded border">
+            <ul className="max-h-64 overflow-auto">
               {matches.map((s) => {
                 const already = memberIds.has(s.id)
                 return (
                   <li key={s.id} className="flex items-center gap-2 p-2">
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">
+                      <p className="truncate text-sm font-normal">
                         {s.first_name} {s.last_name}
                       </p>
                       <p className="truncate text-xs text-muted-foreground">
@@ -754,18 +754,18 @@ function RemoveStudentDialog({
           <button
             type="button"
             onClick={keepHistory}
-            className="w-full rounded-lg border p-3 text-start hover:bg-accent"
+            className="w-full border border-hairline p-3 text-start transition-colors hover:border-lamp"
           >
-            <p className="font-medium">{t('ensemble.removeKeep')}</p>
-            <p className="text-sm text-muted-foreground">{t('ensemble.removeKeepHint')}</p>
+            <p className="font-ui text-[15px] font-light text-score">{t('ensemble.removeKeep')}</p>
+            <p className="mt-1 font-ui text-[12.5px] font-light text-faint">{t('ensemble.removeKeepHint')}</p>
           </button>
           <button
             type="button"
             onClick={forever}
-            className="w-full rounded-lg border border-destructive/40 p-3 text-start hover:bg-destructive/10"
+            className="w-full border border-status-absent/40 p-3 text-start transition-colors hover:border-status-absent"
           >
-            <p className="font-medium text-destructive">{t('ensemble.removeForever')}</p>
-            <p className="text-sm text-muted-foreground">{t('ensemble.removeForeverHint')}</p>
+            <p className="font-ui text-[15px] font-light text-status-absent">{t('ensemble.removeForever')}</p>
+            <p className="mt-1 font-ui text-[12.5px] font-light text-faint">{t('ensemble.removeForeverHint')}</p>
           </button>
         </div>
       </DialogContent>

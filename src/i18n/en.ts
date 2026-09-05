@@ -10,6 +10,17 @@ const en = {
     friday: 'Friday',
     saturday: 'Saturday',
   },
+  /* Single letters for the Home weekday strip. Content, not icons — they change per
+     language (UI-SPEC §7), so they live here rather than being derived. */
+  weekdayLetters: {
+    sunday: 'S',
+    monday: 'M',
+    tuesday: 'T',
+    wednesday: 'W',
+    thursday: 'T',
+    friday: 'F',
+    saturday: 'S',
+  },
   kinds: {
     rehearsal: 'Rehearsal',
     special_rehearsal: 'Special rehearsal',

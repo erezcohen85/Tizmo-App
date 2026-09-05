@@ -177,7 +177,7 @@ export function EnsembleFormDialog({
           <Input placeholder="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
 
           <div className="space-y-1">
-            <p className="text-sm font-medium">{t('manage.weeklyDays')}</p>
+            <p className="text-sm font-normal">{t('manage.weeklyDays')}</p>
             <div className="flex flex-wrap gap-2">
               {[0, 1, 2, 3, 4, 5, 6].map((d) => (
                 <label key={d} className="flex items-center gap-1 text-sm">
@@ -202,7 +202,7 @@ export function EnsembleFormDialog({
           />
 
           <div className="space-y-1">
-            <p className="text-sm font-medium">{t('manage.color')}</p>
+            <p className="text-sm font-normal">{t('manage.color')}</p>
             <div className="flex flex-wrap items-center gap-2">
               {PRESET_COLORS.map((c) => (
                 <button
@@ -228,7 +228,7 @@ export function EnsembleFormDialog({
           </div>
 
           <div className="space-y-1 border-t pt-3">
-            <p className="text-sm font-medium">{t('manage.season')}</p>
+            <p className="text-sm font-normal">{t('manage.season')}</p>
             <div className="flex items-center gap-2">
               <Input type="date" value={form.seasonFrom} onChange={(e) => setForm({ ...form, seasonFrom: e.target.value })} />
               <span className="text-sm text-muted-foreground">{t('history.to')}</span>

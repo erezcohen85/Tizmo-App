@@ -146,13 +146,13 @@ export default function ImportPanel({ onDone }: { onDone?: () => void } = {}) {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <p className="text-sm font-medium">{t('import.target')}</p>
+        <p className="text-sm font-normal">{t('import.target')}</p>
         <EnsembleSelect ensembles={ensembles ?? []} value={ensembleId} onChange={setEnsembleId} />
         <Input type="date" value={joinedOn} onChange={(e) => setJoinedOn(e.target.value)} className="w-40" />
       </div>
 
       <div className="space-y-2">
-        <p className="text-sm font-medium">{t('import.file')}</p>
+        <p className="text-sm font-normal">{t('import.file')}</p>
         <div className="flex flex-wrap items-center gap-2">
           <Input
             type="file"
@@ -174,7 +174,7 @@ export default function ImportPanel({ onDone }: { onDone?: () => void } = {}) {
         <>
           {sheetNames.length > 1 && (
             <div className="space-y-2">
-              <p className="text-sm font-medium">{t('import.sheet')}</p>
+              <p className="text-sm font-normal">{t('import.sheet')}</p>
               <Select value={sheetName} onValueChange={(v) => workbook && loadSheet(workbook, v)}>
                 <SelectTrigger className="w-64">
                   <SelectValue />
@@ -191,7 +191,7 @@ export default function ImportPanel({ onDone }: { onDone?: () => void } = {}) {
           )}
 
           <div className="space-y-2">
-            <p className="text-sm font-medium">{t('import.mapColumns')}</p>
+            <p className="text-sm font-normal">{t('import.mapColumns')}</p>
             {COLUMNS.map((col) => (
               <div key={col} className="flex items-center gap-2">
                 <span className="w-24 text-sm">{col}</span>
@@ -222,10 +222,10 @@ export default function ImportPanel({ onDone }: { onDone?: () => void } = {}) {
           </div>
 
           <div className="space-y-2">
-            <p className="text-sm font-medium">
+            <p className="text-sm font-normal">
               {t('import.preview')} ({mapped.length} rows, {invalidCount} {t('import.invalid')})
             </p>
-            <div className="max-h-64 overflow-auto rounded border">
+            <div className="max-h-64 overflow-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -260,7 +260,7 @@ export default function ImportPanel({ onDone }: { onDone?: () => void } = {}) {
           )}
 
           {result && (
-            <div className="rounded border p-3 text-sm">
+            <div className="py-3 font-ui text-[12.5px] font-light text-dim">
               {result.inserted} {t('import.inserted')} · {result.linked} {t('import.linked')} · {result.skipped}{' '}
               {t('import.skipped')} · {result.invalid} {t('import.invalid')}
             </div>

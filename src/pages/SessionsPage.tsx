@@ -297,7 +297,7 @@ function CreateSessionDialog({
           <Input placeholder={t('session.title')} value={title} onChange={(e) => setTitle(e.target.value)} />
           <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
           <div className="space-y-1">
-            <p className="text-sm font-medium">{t('session.ensembles')}</p>
+            <p className="text-sm font-normal">{t('session.ensembles')}</p>
             {ensembles.map((e) => (
               <label key={e.id} className="flex items-center gap-2 text-sm">
                 <input
@@ -404,7 +404,7 @@ function SessionDetailSheet({
 
           {!isRehearsal && (
             <div className="space-y-1">
-              <p className="text-sm font-medium">{t('session.ensembles')}</p>
+              <p className="text-sm font-normal">{t('session.ensembles')}</p>
               {ensembles.map((e) => (
                 <label key={e.id} className="flex items-center gap-2 text-sm">
                   <input

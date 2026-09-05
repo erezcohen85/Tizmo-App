@@ -9,8 +9,11 @@ export default {
         alt: ['Alef', 'system-ui', 'sans-serif'],
       },
       colors: {
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
+        /* The spec allows exactly one line weight: a hairline at 9%. Mapping the generic
+           shadcn `border`/`input` tokens onto it means every stock `border` in the UI
+           primitives renders as that hairline instead of a full-opacity box. */
+        border: 'hsl(var(--hairline) / var(--hairline-a))',
+        input: 'hsl(var(--hairline) / var(--hairline-a))',
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
@@ -24,7 +27,9 @@ export default {
         },
         muted: {
           DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
+          /* `--muted-foreground` is a full-opacity triplet, so stock `text-muted-foreground`
+             rendered secondary text at primary strength. Point it at the spec's `dim`. */
+          foreground: 'hsl(var(--dim) / var(--dim-a))',
         },
         accent: {
           DEFAULT: 'hsl(var(--accent))',

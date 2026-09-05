@@ -1,8 +1,8 @@
 import { toast } from 'sonner'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useI18n } from '@/i18n'
+import { cn } from '@/lib/utils'
 import { toastSuccess } from '@/lib/toastUndo'
 import { useCreateShareLink, useRegenerateShareLink, useRevokeShareLink, useShareLinks } from '@/queries/shareLinks'
 
@@ -65,16 +65,22 @@ export function ShareLinkDialog({
             {t('manage.newShareLink')}
           </Button>
 
-          <ul className="divide-y rounded-lg border">
+          <ul>
             {scoped.map((l) => {
               const url = `${window.location.origin}/share/${l.token}`
               return (
-                <li key={l.id} className={`space-y-2 p-3 ${l.revoked ? 'opacity-50' : ''}`}>
+                <li key={l.id} className={`space-y-2 py-3 shadow-separator ${l.revoked ? 'opacity-50' : ''}`}>
                   <div className="flex items-center gap-2">
-                    <Badge variant={l.revoked ? 'outline' : 'secondary'}>
+                    {/* A coloured word, not a pill — UI-SPEC §8. */}
+                    <span
+                      className={cn(
+                        'font-alt text-[11.5px] tracking-[.14em]',
+                        l.revoked ? 'text-faint' : 'text-status-present',
+                      )}
+                    >
                       {l.revoked ? t('manage.revoked') : t('manage.active')}
-                    </Badge>
-                    <span className="truncate text-xs text-muted-foreground">{url}</span>
+                    </span>
+                    <span className="truncate text-[11.5px] text-faint">{url}</span>
                   </div>
                   <div className="flex flex-wrap gap-1">
                     <Button

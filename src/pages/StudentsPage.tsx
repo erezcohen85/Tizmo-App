@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Plus, Upload } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -239,7 +238,7 @@ function StudentDetailSheet({ student, onClose }: { student: Tables<'students'>;
                     <TableCell>{stats.absent}</TableCell>
                     <TableCell>{stats.late}</TableCell>
                     <TableCell
-                      className={cn('font-medium', stats.percentage !== null && stats.percentage < 70 && 'text-destructive')}
+                      className={cn('font-normal', stats.percentage !== null && stats.percentage < 70 && 'text-destructive')}
                     >
                       {stats.percentage === null ? '—' : `${stats.percentage}%`}
                     </TableCell>
@@ -256,15 +255,20 @@ function StudentDetailSheet({ student, onClose }: { student: Tables<'students'>;
             </TableBody>
           </Table>
 
-          <div className="flex flex-wrap gap-1">
+          <div className="space-y-1.5">
             {own.map((m) => {
               const ensemble = ensembles?.find((e) => e.id === m.ensemble_id)
               if (!ensemble) return null
               return (
-                <Badge key={m.ensemble_id} variant="outline">
-                  {ensemble.name} · {m.joined_on}
-                  {m.terminated_on ? ` → ${m.terminated_on}` : ''}
-                </Badge>
+                /* A dot and a name, not a pill — UI-SPEC §2 and §8. */
+                <div key={m.ensemble_id} className="flex items-center gap-2 text-[12.5px]">
+                  <EnsembleDot color={ensemble.color} />
+                  <span className="text-dim">{ensemble.name}</span>
+                  <span className="text-faint tabular-nums">
+                    {m.joined_on}
+                    {m.terminated_on ? ` → ${m.terminated_on}` : ''}
+                  </span>
+                </div>
               )
             })}
           </div>
@@ -375,7 +379,7 @@ function StudentSheet({
           <Input placeholder="Grade" value={grade} onChange={(e) => setGrade(e.target.value)} />
 
           <div className="space-y-2">
-            <p className="text-sm font-medium">{t('manage.memberships')}</p>
+            <p className="text-sm font-normal">{t('manage.memberships')}</p>
             {rows.map((r, i) => (
               <div key={i} className="flex items-center gap-2">
                 <Select
