@@ -1,10 +1,38 @@
+import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import { useI18n } from '@/i18n'
 import { cn } from '@/lib/utils'
 import { toastSuccess } from '@/lib/toastUndo'
-import { useCreateShareLink, useRegenerateShareLink, useRevokeShareLink, useShareLinks } from '@/queries/shareLinks'
+import {
+  useCreateShareLink,
+  useRegenerateShareLink,
+  useRevokeShareLink,
+  useShareLinks,
+  useUpdateShareLinkLabel,
+} from '@/queries/shareLinks'
+import type { ShareLink } from '@/lib/functions'
+
+export function ShareLinkLabelEditor({ link }: { link: ShareLink }) {
+  const { t } = useI18n()
+  const updateLabel = useUpdateShareLinkLabel()
+  const [value, setValue] = useState(link.label ?? '')
+
+  return (
+    <Input
+      value={value}
+      placeholder={t('manage.labelPlaceholder')}
+      onChange={(e) => setValue(e.target.value)}
+      onBlur={() => {
+        if (value === (link.label ?? '')) return
+        updateLabel.mutate({ id: link.id, label: value })
+      }}
+      className="h-auto border-0 border-b border-hairline bg-transparent px-0 py-0.5 text-[12.5px] font-light text-dim focus-visible:ring-0"
+    />
+  )
+}
 
 /**
  * Manage share links for one ensemble (ensembleId set) or for all ensembles (ensembleId undefined).
@@ -25,6 +53,7 @@ export function ShareLinkDialog({
   const createLink = useCreateShareLink()
   const revokeLink = useRevokeShareLink()
   const regenerateLink = useRegenerateShareLink()
+  const [noteDraft, setNoteDraft] = useState('')
 
   const scoped = (links ?? []).filter((l) =>
     ensembleId ? l.ensemble_id === ensembleId : l.scope === 'all',
@@ -34,9 +63,10 @@ export function ShareLinkDialog({
     try {
       const link = await createLink.mutateAsync(
         ensembleId
-          ? { scope: 'single_ensemble', ensemble_id: ensembleId, label: ensembleName }
-          : { scope: 'all' },
+          ? { scope: 'single_ensemble', ensemble_id: ensembleId, label: noteDraft || undefined }
+          : { scope: 'all', label: noteDraft || undefined },
       )
+      setNoteDraft('')
       toastSuccess(t('toasts.shareLinkCreated'), {
         label: t('common.undo'),
         onUndo: async () => {
@@ -61,9 +91,17 @@ export function ShareLinkDialog({
         </DialogHeader>
 
         <div className="space-y-3">
-          <Button size="sm" onClick={create}>
-            {t('manage.newShareLink')}
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Input
+              value={noteDraft}
+              onChange={(e) => setNoteDraft(e.target.value)}
+              placeholder={t('manage.labelPlaceholder')}
+              className="h-9 max-w-56"
+            />
+            <Button size="sm" onClick={create}>
+              {t('manage.newShareLink')}
+            </Button>
+          </div>
 
           <ul>
             {scoped.map((l) => {
@@ -82,6 +120,7 @@ export function ShareLinkDialog({
                     </span>
                     <span className="truncate text-[11.5px] text-faint">{url}</span>
                   </div>
+                  <ShareLinkLabelEditor link={l} />
                   <div className="flex flex-wrap gap-1">
                     <Button
                       variant="ghost"

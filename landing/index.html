@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Tizmo — attendance and automation for music educators. Coming soon." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Assistant:wght@200;300;400&family=Fraunces:opsz,wght@9..144,300&display=swap"
+      rel="stylesheet"
+    />
+    <title>Tizmo</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --stage: 216 40% 8%;
+        --stand: 213 36% 11%;
+        --score: 44 25% 88%;
+        --dim: 44 25% 88%;
+        --dim-a: 0.46;
+        --faint: 44 25% 88%;
+        --faint-a: 0.24;
+        --lamp: 38 67% 73%;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 28px;
+        min-height: 100dvh;
+        background: hsl(var(--stage));
+        color: hsl(var(--score));
+        font-family: 'Assistant', system-ui, sans-serif;
+        font-weight: 400;
+        overflow: hidden;
+      }
+
+      /* the stand light: a static warm wash behind the mark, same as the app's header */
+      body::before {
+        content: '';
+        position: fixed;
+        left: 50%;
+        top: -10%;
+        width: 70vw;
+        height: 40vh;
+        max-width: 640px;
+        transform: translateX(-50%);
+        background: radial-gradient(closest-side, hsl(var(--lamp) / 0.1), transparent 70%);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .logo {
+        position: relative;
+        z-index: 1;
+        height: 84px;
+        width: auto;
+        color: hsl(var(--score));
+      }
+
+      .tagline {
+        position: relative;
+        z-index: 1;
+        margin: 0;
+        font-size: 22px;
+        font-weight: 300;
+        line-height: 1.7;
+        color: hsl(var(--dim) / var(--dim-a));
+        text-align: center;
+        max-width: 480px;
+        padding: 0 24px;
+      }
+
+      .coming-soon {
+        position: relative;
+        z-index: 1;
+        font-family: 'Assistant', system-ui, sans-serif;
+        font-size: 20px;
+        font-weight: 400;
+        letter-spacing: 0.18em;
+        color: hsl(var(--lamp));
+        text-shadow: 0 0 18px hsl(var(--lamp) / 0.6), 0 0 36px hsl(var(--lamp) / 0.35);
+      }
+
+      .early-adopter {
+        position: relative;
+        z-index: 1;
+        margin: 0;
+        font-size: 17px;
+        font-weight: 300;
+        color: hsl(var(--dim) / var(--dim-a));
+        text-align: center;
+      }
+
+      .early-adopter a {
+        color: hsl(var(--dim) / var(--dim-a));
+        text-decoration: none;
+        border-bottom: 1px solid hsl(var(--dim) / var(--dim-a));
+        transition: color 0.15s ease, border-color 0.15s ease;
+      }
+
+      .early-adopter a:hover {
+        color: hsl(var(--lamp));
+        border-color: hsl(var(--lamp));
+      }
+    </style>
+  </head>
+  <body>
+    <svg class="logo" viewBox="28 34 306 116" role="img" aria-label="Tizmo">
+      <text
+        x="180"
+        y="106"
+        text-anchor="middle"
+        font-family="Fraunces, Georgia, serif"
+        font-weight="300"
+        font-size="80"
+        letter-spacing="1"
+        fill="currentColor"
+      >
+        Tizmo
+      </text>
+      <path
+        d="M 38 132 C 100 116, 150 144, 200 130 C 248 117, 296 140, 322 126"
+        fill="none"
+        style="stroke: hsl(var(--lamp))"
+        stroke-width="5"
+        stroke-linecap="round"
+      />
+    </svg>
+    <p class="tagline">Attendance and automation<br />for music educators.</p>
+    <p class="coming-soon">COMING SOON</p>
+    <p class="early-adopter">Want to be an early adopter? <a href="mailto:tizmo.app@gmail.com">Contact us</a>.</p>
+  </body>
+</html>

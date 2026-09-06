@@ -3,10 +3,12 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useI18n } from '@/i18n'
 import { todayISO, weekdayKey } from '@/lib/dates'
 import { toastSuccess } from '@/lib/toastUndo'
 import { cn } from '@/lib/utils'
+import type { Database } from '@/lib/database.types'
 import {
   useBulkCreateRehearsals,
   useCreateEnsemble,
@@ -14,6 +16,8 @@ import {
   useUpdateEnsemble,
   type EnsembleWithWeekdays,
 } from '@/queries/ensembles'
+
+type SessionKind = Database['public']['Enums']['session_kind']
 
 export const PRESET_COLORS = ['#0d9488', '#2563eb', '#7c3aed', '#db2777', '#dc2626', '#ea580c', '#ca8a04', '#16a34a']
 
@@ -41,6 +45,8 @@ type FormState = {
   color: string
   seasonFrom: string
   seasonTo: string
+  sessionKind: SessionKind
+  sessionTitle: string
 }
 
 function formFor(ensemble: EnsembleWithWeekdays | null, usedColors: string[]): FormState {
@@ -54,6 +60,8 @@ function formFor(ensemble: EnsembleWithWeekdays | null, usedColors: string[]): F
       color: ensemble.color,
       seasonFrom: ensemble.season_start ?? '',
       seasonTo: ensemble.season_end ?? '',
+      sessionKind: 'rehearsal',
+      sessionTitle: '',
     }
   }
   const used = new Set(usedColors.map((c) => c.toLowerCase()))
@@ -66,6 +74,8 @@ function formFor(ensemble: EnsembleWithWeekdays | null, usedColors: string[]): F
     color: PRESET_COLORS.find((c) => !used.has(c)) ?? PRESET_COLORS[0],
     seasonFrom: todayISO(),
     seasonTo: todayISO(),
+    sessionKind: 'rehearsal',
+    sessionTitle: '',
   }
 }
 
@@ -104,6 +114,8 @@ export function EnsembleFormDialog({
         from: form.seasonFrom,
         to: form.seasonTo,
         weekdays: form.weekdays,
+        kind: form.sessionKind,
+        title: form.sessionKind === 'other' ? form.sessionTitle || null : null,
       })
     } catch {
       toast.error(t('errors.saveFailed'))
@@ -255,7 +267,27 @@ export function EnsembleFormDialog({
 
           <div className="space-y-1 border-t pt-3">
             <p className="text-sm font-normal">{t('manage.season')}</p>
-            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+            <Select value={form.sessionKind} onValueChange={(v) => setForm({ ...form, sessionKind: v as SessionKind })}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {(['rehearsal', 'special_rehearsal', 'group_lesson', 'music_theory', 'concert', 'other'] as const).map((k) => (
+                  <SelectItem key={k} value={k}>
+                    {t(`kinds.${k}` as never)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {form.sessionKind === 'other' && (
+              <Input
+                placeholder={t('session.title')}
+                value={form.sessionTitle}
+                onChange={(e) => setForm({ ...form, sessionTitle: e.target.value })}
+              />
+            )}
+            <div className="grid grid-cols-[auto_1fr_auto_1fr] items-center gap-2">
+              <span className="text-sm text-muted-foreground">{t('history.from')}</span>
               <Input type="date" value={form.seasonFrom} onChange={(e) => setForm({ ...form, seasonFrom: e.target.value })} />
               <span className="text-sm text-muted-foreground">{t('history.to')}</span>
               <Input type="date" value={form.seasonTo} onChange={(e) => setForm({ ...form, seasonTo: e.target.value })} />

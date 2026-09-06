@@ -347,6 +347,8 @@ export type Database = {
           p_from: string
           p_to: string
           p_weekdays: number[]
+          p_kind?: Database["public"]["Enums"]["session_kind"]
+          p_title?: string | null
         }
         Returns: number
       }
@@ -441,6 +443,8 @@ export type Database = {
         | "exam"
         | "concert"
         | "other"
+        | "group_lesson"
+        | "music_theory"
       session_status: "scheduled" | "held" | "canceled"
       share_scope: "all" | "single_ensemble"
     }
@@ -579,6 +583,8 @@ export const Constants = {
         "exam",
         "concert",
         "other",
+        "group_lesson",
+        "music_theory",
       ],
       session_status: ["scheduled", "held", "canceled"],
       share_scope: ["all", "single_ensemble"],

@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
 import { EnsembleDot } from '@/components/EnsembleDot'
@@ -108,11 +108,15 @@ export default function SessionsPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="__all__">{t('sessions.allTypes')}</SelectItem>
-            {(['rehearsal', 'special_rehearsal', 'field_trip', 'exam', 'concert', 'other'] as const).map((k) => (
+            {(['rehearsal', 'special_rehearsal', 'group_lesson', 'music_theory', 'concert'] as const).map((k) => (
               <SelectItem key={k} value={k}>
                 {t(`kinds.${k}` as never)}
               </SelectItem>
             ))}
+            <SelectSeparator />
+            <SelectItem value="other">{t('kinds.other')}</SelectItem>
+            <SelectItem value="field_trip">{t('kinds.field_trip')}</SelectItem>
+            <SelectItem value="exam">{t('kinds.exam')}</SelectItem>
           </SelectContent>
         </Select>
 
@@ -141,6 +145,7 @@ export default function SessionsPage() {
         </Select>
 
         <div className="flex items-center gap-1.5 text-dim">
+          <span className="text-faint">{t('history.from')}</span>
           <input
             type="date"
             value={from}
@@ -286,7 +291,7 @@ function CreateSessionDialog({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {(['special_rehearsal', 'field_trip', 'exam', 'concert', 'other'] as const).map((k) => (
+              {(['special_rehearsal', 'group_lesson', 'music_theory', 'concert', 'other'] as const).map((k) => (
                 <SelectItem key={k} value={k}>
                   {t(`kinds.${k}` as never)}
                 </SelectItem>
