@@ -131,9 +131,38 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Assistant', system-ui, sans-serif;
-    font-weight: 300;
+    font-weight: 400;
     font-size: 16px;
     position: relative;
+  }
+
+  /* Assistant 300 reads thin against the dark palette's near-white foreground, so dark
+     mode keeps the original weight; light mode gets the heavier default above. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) body {
+      font-weight: 300;
+    }
+  }
+  :root[data-theme='dark'] body {
+    font-weight: 300;
+  }
+
+  /* Font size setting: the app's type scale is arbitrary px (not rem), so a root
+     rem/font-size change wouldn't reach it — zoom scales the whole layout uniformly.
+     'medium' is the new default, slightly larger than the old unscaled baseline.
+     Scoped to the signed-in app shell (.app-scale) only — the public share page and
+     auth screens aren't part of this setting and must not be zoomed by it. */
+  html[data-font-size='small'] .app-scale {
+    zoom: 1;
+  }
+  html[data-font-size='medium'] .app-scale {
+    zoom: 1.18;
+  }
+  html[data-font-size='large'] .app-scale {
+    zoom: 1.34;
+  }
+  html[data-font-size='xlarge'] .app-scale {
+    zoom: 1.5;
   }
 
   /* the stand light: a static warm wash behind the header area */
