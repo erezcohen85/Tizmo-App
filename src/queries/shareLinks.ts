@@ -65,6 +65,23 @@ export function useRegenerateShareLink() {
   })
 }
 
+export function useUpdateShareLinkLabel() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, label }: { id: string; label: string }) => {
+      const { data, error } = await supabase
+        .from('share_links')
+        .update({ label: label || null })
+        .eq('id', id)
+        .select('*')
+        .single()
+      if (error) throw error
+      return data as ShareLink
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['shareLinks'] }),
+  })
+}
+
 export function useDeleteShareLink() {
   const qc = useQueryClient()
   return useMutation({

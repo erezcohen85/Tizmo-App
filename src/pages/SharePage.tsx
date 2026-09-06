@@ -3,7 +3,7 @@ import { useParams, useSearchParams } from 'react-router-dom'
 import { CalendarDays, Download, ListFilter } from 'lucide-react'
 import { Logo } from '@/components/Logo'
 import { OptionRow } from '@/components/OptionRow'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useI18n } from '@/i18n'
 import { shiftISODate, todayISO } from '@/lib/dates'
@@ -202,15 +202,20 @@ export default function SharePage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="__all__">{t('sessions.allTypes')}</SelectItem>
-              {(['rehearsal', 'special_rehearsal', 'field_trip', 'exam', 'concert', 'other'] as const).map((k) => (
+              {(['rehearsal', 'special_rehearsal', 'group_lesson', 'music_theory', 'concert'] as const).map((k) => (
                 <SelectItem key={k} value={k}>
                   {t(`kinds.${k}` as never)}
                 </SelectItem>
               ))}
+              <SelectSeparator />
+              <SelectItem value="other">{t('kinds.other')}</SelectItem>
+              <SelectItem value="field_trip">{t('kinds.field_trip')}</SelectItem>
+              <SelectItem value="exam">{t('kinds.exam')}</SelectItem>
             </SelectContent>
           </Select>
           <div className="flex items-center gap-1.5 text-dim">
             <CalendarDays className="size-3.5 text-faint" strokeWidth={1.4} />
+            <span className="text-faint">{t('history.from')}</span>
             <input
               type="date"
               value={from}

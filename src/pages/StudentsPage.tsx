@@ -199,6 +199,7 @@ function StudentDetailSheet({ student, onClose }: { student: Tables<'students'>;
           </p>
 
           <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm text-muted-foreground">{t('history.from')}</span>
             <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="w-40" />
             <span className="text-sm text-muted-foreground">{t('history.to')}</span>
             <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="w-40" />

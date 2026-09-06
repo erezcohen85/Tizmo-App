@@ -2,6 +2,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { EnsembleDot } from '@/components/EnsembleDot'
+import { ShareLinkLabelEditor } from '@/components/ShareLinkDialog'
 import { useI18n } from '@/i18n'
 import { toastSuccess } from '@/lib/toastUndo'
 import { useEnsembles } from '@/queries/ensembles'
@@ -49,6 +50,7 @@ export function ManageShareLinksDialog({ open, onOpenChange }: { open: boolean; 
                   <span className="ms-auto text-[11.5px] text-faint">{created}</span>
                 </div>
                 <p className="truncate text-[11.5px] text-faint">{url}</p>
+                <ShareLinkLabelEditor link={l} />
                 <div className="flex flex-wrap gap-1">
                   <Button
                     variant="ghost"

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
-import type { Tables, TablesInsert, TablesUpdate } from '@/lib/database.types'
+import type { Database, Tables, TablesInsert, TablesUpdate } from '@/lib/database.types'
 
 export type EnsembleWithWeekdays = Tables<'ensembles'> & { weekdays: number[] }
 
@@ -82,12 +82,21 @@ export function useDeleteEnsemble() {
 export function useBulkCreateRehearsals() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (input: { ensembleId: string; from: string; to: string; weekdays: number[] }) => {
+    mutationFn: async (input: {
+      ensembleId: string
+      from: string
+      to: string
+      weekdays: number[]
+      kind?: Database['public']['Enums']['session_kind']
+      title?: string | null
+    }) => {
       const { data, error } = await supabase.rpc('bulk_create_rehearsals', {
         p_ensemble_id: input.ensembleId,
         p_from: input.from,
         p_to: input.to,
         p_weekdays: input.weekdays,
+        p_kind: input.kind ?? 'rehearsal',
+        p_title: input.title ?? null,
       })
       if (error) throw error
       return data as number
