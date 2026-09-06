@@ -40,6 +40,12 @@ Deno.serve(async (req: Request) => {
   if (linkError || !link) return json({ error: 'invalid_token' }, 404)
   if (link.revoked) return json({ error: 'revoked' }, 410)
 
+  const { data: ownerProfile } = await supabase
+    .from('profiles')
+    .select('email')
+    .eq('id', link.owner_id)
+    .maybeSingle()
+
   const ensembleFilter = link.scope === 'single_ensemble' ? link.ensemble_id : ensembleParam
 
   const { data: ensembles } = await supabase.from('ensembles').select('id, name').eq('owner_id', link.owner_id)
@@ -109,6 +115,7 @@ Deno.serve(async (req: Request) => {
 
   const response = {
     scope: link.scope,
+    owner_email: ownerProfile?.email ?? null,
     ensembles: (ensembles ?? []).filter((e) => !ensembleFilter || e.id === ensembleFilter),
     students: studentRows ?? [],
     sessions: sessions.map((s) => ({

@@ -17,6 +17,21 @@ import {
 
 export const PRESET_COLORS = ['#0d9488', '#2563eb', '#7c3aed', '#db2777', '#dc2626', '#ea580c', '#ca8a04', '#16a34a']
 
+function toMinutes(hhmm: string): number {
+  const [h, m] = hhmm.split(':').map(Number)
+  return h * 60 + m
+}
+
+function addMinutes(hhmm: string, minutes: number): string {
+  const total = (toMinutes(hhmm) + minutes + 1440) % 1440
+  return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
+}
+
+function diffMinutes(start: string, end: string): number {
+  const d = toMinutes(end) - toMinutes(start)
+  return d > 0 ? d : d + 1440
+}
+
 type FormState = {
   name: string
   weekdays: number[]
@@ -188,13 +203,24 @@ export function EnsembleFormDialog({
             </div>
           </div>
 
-          <Input type="time" value={form.start_time} onChange={(e) => setForm({ ...form, start_time: e.target.value })} />
-          <Input
-            type="number"
-            min={1}
-            value={form.duration_minutes}
-            onChange={(e) => setForm({ ...form, duration_minutes: Number(e.target.value) })}
-          />
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1">
+              <p className="text-sm font-normal">{t('session.startTime')}</p>
+              <Input
+                type="time"
+                value={form.start_time}
+                onChange={(e) => setForm({ ...form, start_time: e.target.value })}
+              />
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-normal">{t('session.endTime')}</p>
+              <Input
+                type="time"
+                value={addMinutes(form.start_time, form.duration_minutes)}
+                onChange={(e) => setForm({ ...form, duration_minutes: diffMinutes(form.start_time, e.target.value) })}
+              />
+            </div>
+          </div>
           <Input
             placeholder={t('session.location')}
             value={form.location}
@@ -229,13 +255,35 @@ export function EnsembleFormDialog({
 
           <div className="space-y-1 border-t pt-3">
             <p className="text-sm font-normal">{t('manage.season')}</p>
-            <div className="flex items-center gap-2">
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
               <Input type="date" value={form.seasonFrom} onChange={(e) => setForm({ ...form, seasonFrom: e.target.value })} />
               <span className="text-sm text-muted-foreground">{t('history.to')}</span>
               <Input type="date" value={form.seasonTo} onChange={(e) => setForm({ ...form, seasonTo: e.target.value })} />
             </div>
             <p className="text-xs text-muted-foreground">{t('manage.seasonHint')}</p>
           </div>
+
+          {ensemble && (
+            <div className="space-y-2 border-t pt-3">
+              <p className="text-xs text-muted-foreground">{t('manage.deleteEnsembleWarning')}</p>
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!confirm(t('manage.deleteEnsembleWarning'))) return
+                  try {
+                    await deleteEnsemble.mutateAsync(ensemble.id)
+                    onOpenChange(false)
+                    toastSuccess(t('toasts.ensembleDeleted'))
+                  } catch {
+                    toast.error(t('errors.saveFailed'))
+                  }
+                }}
+                className="border border-status-absent px-4 py-2 font-ui text-[12.5px] font-light text-status-absent transition-colors hover:bg-status-absent/10"
+              >
+                {t('manage.deleteEnsemble')}
+              </button>
+            </div>
+          )}
         </div>
         <DialogFooter>
           <Button onClick={submit} disabled={!form.weekdays.length}>

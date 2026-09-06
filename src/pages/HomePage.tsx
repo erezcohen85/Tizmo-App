@@ -11,7 +11,6 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { EmptyState } from '@/components/EmptyState'
 import { EnsembleDot } from '@/components/EnsembleDot'
-import { WeekdayStrip } from '@/components/WeekdayStrip'
 import { EnsembleFormDialog } from '@/components/EnsembleFormDialog'
 import { ShareLinkDialog } from '@/components/ShareLinkDialog'
 import { useI18n } from '@/i18n'
@@ -22,8 +21,16 @@ import { useEnsembles, useReorderEnsembles, type EnsembleWithWeekdays } from '@/
 import { useMemberships } from '@/queries/students'
 import { useSessionsInRange } from '@/queries/sessions'
 
+function weekdaysLabel(days: number[], lang: string, t: (k: never) => string) {
+  const names = [...days]
+    .sort((a, b) => a - b)
+    .map((d) => t(weekdayKey(d) as never))
+  if (lang === 'he') return names.map((n) => `יום ${n}`).join(', ')
+  return names.join(', ')
+}
+
 export default function HomePage() {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const { data: ensembles } = useEnsembles()
   const { data: memberships } = useMemberships()
 
@@ -167,21 +174,23 @@ export default function HomePage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-ui text-[12.5px] font-light">
-        <button type="button" onClick={openCreate} className="inline-flex items-center gap-1.5 text-dim transition-colors hover:text-lamp">
-          <Plus className="size-3.5" strokeWidth={1.4} />
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 font-ui text-[13.5px] font-normal">
+        <button type="button" onClick={openCreate} className="inline-flex items-center gap-1.5 text-score transition-colors hover:text-lamp">
+          <Plus className="size-4" strokeWidth={1.6} />
           {t('home.newEnsemble')}
         </button>
         <button
           type="button"
           onClick={() => setShareAllOpen(true)}
-          className="inline-flex items-center gap-1.5 text-dim transition-colors hover:text-lamp"
+          className="inline-flex items-center gap-1.5 text-score transition-colors hover:text-lamp"
         >
-          <Share2 className="size-3.5" strokeWidth={1.4} />
+          <Share2 className="size-4" strokeWidth={1.6} />
           {t('home.shareAll')}
         </button>
+      </div>
 
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-ui text-[12.5px] font-light">
         <Select
           value={dayFilter === undefined ? '__all__' : String(dayFilter)}
           onValueChange={(v) => setDayFilter(v === '__all__' ? undefined : Number(v))}
@@ -284,7 +293,7 @@ export default function HomePage() {
                     {e.name}
                     {needsEntry > 0 && <span className="size-[5px] rounded-full bg-lamp" aria-label={t('home.needsEntry')} />}
                   </p>
-                  <WeekdayStrip days={e.weekdays} className="mt-[7px]" />
+                  <p className="mt-[7px] font-alt text-[10.5px] tracking-[.1em] text-faint">{weekdaysLabel(e.weekdays, lang, t)}</p>
                   <p className="mt-[5px] text-[11.5px] text-faint">
                     {e.start_time.slice(0, 5)} · {memberCount} {t('home.students')}
                     {next && <> · {t('home.nextSession')} {next.date}</>}
@@ -308,7 +317,7 @@ export default function HomePage() {
                 <EnsembleDot color={e.color} />
                 <Link to={`/ensemble/${e.id}`} className="min-w-40 flex-1">
                   <p className="text-[15.5px] tracking-[-.005em] text-score">{e.name}</p>
-                  <WeekdayStrip days={e.weekdays} className="mt-[7px]" />
+                  <p className="mt-[7px] font-alt text-[10.5px] tracking-[.1em] text-faint">{weekdaysLabel(e.weekdays, lang, t)}</p>
                   <p className="mt-[5px] text-[11.5px] text-faint">
                     {e.start_time.slice(0, 5)} · {memberCount} {t('home.students')}
                     {next && <> · {t('home.nextSession')} {next.date}</>}

@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpDown, Plus, X } from 'lucide-react'
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpDown, Plus, Share2, Upload, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
@@ -14,6 +15,8 @@ import { EmptyState } from '@/components/EmptyState'
 import { EnsembleSelect } from '@/components/EnsembleSelect'
 import { StatusCell } from '@/components/StatusCell'
 import { StudentNoteButton } from '@/components/StudentNoteButton'
+import { ShareLinkDialog } from '@/components/ShareLinkDialog'
+import ImportPanel from './ImportPanel'
 import { useI18n } from '@/i18n'
 import { shiftISODate, todayISO } from '@/lib/dates'
 import { activeMembershipsOn, computeSessionCounts, computeStudentStats } from '@/lib/roster'
@@ -229,6 +232,8 @@ export default function EnsemblePage() {
   const isCanceled = state === 'canceled'
 
   const [addOpen, setAddOpen] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
+  const [shareOpen, setShareOpen] = useState(false)
   const [removing, setRemoving] = useState<Tables<'students'> | null>(null)
 
   if (!ensembles) return null
@@ -260,14 +265,32 @@ export default function EnsemblePage() {
         <TabsContent value="attendance" className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <DateNav date={date} onChange={setDate} availableDates={availableDates} />
-            <button
-              type="button"
-              onClick={() => setAddOpen(true)}
-              className="inline-flex items-center gap-1.5 font-ui text-[12.5px] font-light text-dim transition-colors hover:text-lamp"
-            >
-              <Plus className="size-3.5" strokeWidth={1.4} />
-              {t('ensemble.addStudent')}
-            </button>
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => setAddOpen(true)}
+                className="inline-flex items-center gap-1.5 font-ui text-[12.5px] font-light text-dim transition-colors hover:text-lamp"
+              >
+                <Plus className="size-3.5" strokeWidth={1.4} />
+                {t('ensemble.addStudent')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setImportOpen(true)}
+                className="inline-flex items-center gap-1.5 font-ui text-[12.5px] font-light text-dim transition-colors hover:text-lamp"
+              >
+                <Upload className="size-3.5" strokeWidth={1.4} />
+                {t('manage.tabImport')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShareOpen(true)}
+                className="inline-flex items-center gap-1.5 font-ui text-[12.5px] font-light text-dim transition-colors hover:text-lamp"
+              >
+                <Share2 className="size-3.5" strokeWidth={1.4} />
+                {t('ensemble.shareAttendance')}
+              </button>
+            </div>
           </div>
 
           {!isRegularDay && <p className="text-sm text-muted-foreground">{t('attendance.notRegularDay')}</p>}
@@ -346,14 +369,14 @@ export default function EnsemblePage() {
               onChange={(e) => handleSessionNote(e.target.value)}
               placeholder={t('attendance.rehearsalNotePlaceholder')}
               rows={2}
-              className="border-0 border-hairline bg-transparent px-0 shadow-none focus-visible:ring-0"
+              className="rounded-none border border-hairline bg-transparent px-2 py-1.5 shadow-none focus-visible:ring-0"
             />
 
             <button
               type="button"
               disabled={isCanceled}
               onClick={handleMarkAllPresent}
-              className="font-ui text-[12.5px] font-light text-dim transition-colors hover:text-lamp disabled:opacity-50"
+              className="font-ui text-[13.5px] font-normal text-score transition-colors hover:text-lamp disabled:opacity-50"
             >
               {t('attendance.markAllPresent')}
             </button>
@@ -463,6 +486,19 @@ export default function EnsemblePage() {
           onClose={() => setRemoving(null)}
         />
       )}
+
+      <ShareLinkDialog open={shareOpen} onOpenChange={setShareOpen} ensembleId={ensemble.id} ensembleName={ensemble.name} />
+
+      <Sheet open={importOpen} onOpenChange={setImportOpen}>
+        <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
+          <SheetHeader>
+            <SheetTitle>{t('manage.tabImport')}</SheetTitle>
+          </SheetHeader>
+          <div className="p-4">
+            <ImportPanel onDone={() => setImportOpen(false)} defaultEnsembleId={ensemble.id} lockEnsemble />
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   )
 }

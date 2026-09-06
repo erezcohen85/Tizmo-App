@@ -17,6 +17,7 @@ export type ShareHistorySession = {
 
 export type ShareHistoryResponse = {
   scope: 'all' | 'single_ensemble'
+  owner_email: string | null
   ensembles: { id: string; name: string }[]
   students: { id: string; first_name: string; last_name: string; instrument: string | null; grade: string | null }[]
   sessions: ShareHistorySession[]

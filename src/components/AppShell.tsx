@@ -15,8 +15,8 @@ export function AppShell() {
   const { t } = useI18n()
 
   return (
-    <div className="relative flex min-h-dvh flex-col bg-stage">
-      <header className="sticky top-0 z-20 flex items-center px-5 py-4">
+    <div className="app-scale relative flex min-h-dvh flex-col bg-stage">
+      <header className="sticky top-0 z-20 flex items-center bg-stage px-5 py-4">
         <Logo title={t('app.name')} />
       </header>
 

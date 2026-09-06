@@ -25,12 +25,16 @@ import { useImportStudents } from '@/queries/students'
 
 const COLUMNS: ColumnKey[] = ['first_name', 'last_name', 'instrument', 'grade']
 
-export default function ImportPanel({ onDone }: { onDone?: () => void } = {}) {
+export default function ImportPanel({
+  onDone,
+  defaultEnsembleId,
+  lockEnsemble,
+}: { onDone?: () => void; defaultEnsembleId?: string; lockEnsemble?: boolean } = {}) {
   const { t } = useI18n()
   const { data: ensembles } = useEnsembles()
   const importStudents = useImportStudents()
 
-  const [ensembleId, setEnsembleId] = useState<string | undefined>(undefined)
+  const [ensembleId, setEnsembleId] = useState<string | undefined>(defaultEnsembleId)
   const [joinedOn, setJoinedOn] = useState(todayISO())
   const [workbook, setWorkbook] = useState<WorkBook | null>(null)
   const [sheetNames, setSheetNames] = useState<string[]>([])
@@ -147,7 +151,11 @@ export default function ImportPanel({ onDone }: { onDone?: () => void } = {}) {
     <div className="space-y-6">
       <div className="space-y-2">
         <p className="text-sm font-normal">{t('import.target')}</p>
-        <EnsembleSelect ensembles={ensembles ?? []} value={ensembleId} onChange={setEnsembleId} />
+        {lockEnsemble ? (
+          <p className="text-sm text-dim">{ensembles?.find((e) => e.id === ensembleId)?.name}</p>
+        ) : (
+          <EnsembleSelect ensembles={ensembles ?? []} value={ensembleId} onChange={setEnsembleId} />
+        )}
         <Input type="date" value={joinedOn} onChange={(e) => setJoinedOn(e.target.value)} className="w-40" />
       </div>
 

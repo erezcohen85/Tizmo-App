@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
+import { CalendarDays, Download, ListFilter } from 'lucide-react'
 import { Logo } from '@/components/Logo'
 import { OptionRow } from '@/components/OptionRow'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -7,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useI18n } from '@/i18n'
 import { shiftISODate, todayISO } from '@/lib/dates'
 import { exportRows } from '@/lib/export'
+import { cn } from '@/lib/utils'
 import { callShareHistory, type ShareHistoryResponse } from '@/lib/functions'
 
 const FILTER_TRIGGER_CLASS =
@@ -42,7 +44,7 @@ export default function SharePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, ensembleId, kind, from, to])
 
-  const [activeTab, setActiveTab] = useState<'bySession' | 'byStudent'>('bySession')
+  const [activeTab, setActiveTab] = useState<'classic' | 'bySession' | 'byStudent'>('classic')
 
   if (state.status === 'loading') {
     return (
@@ -107,16 +109,51 @@ export default function SharePage() {
     }
   })
 
+  const heldSessions = [...data.sessions]
+    .filter((s) => s.status === 'held')
+    .sort((a, b) => a.date.localeCompare(b.date) || a.start_time?.localeCompare(b.start_time ?? '') || 0)
+
+  const classicRows = data.students.map((s) => ({
+    name: `${s.first_name} ${s.last_name}`,
+    cells: heldSessions.map((session) => {
+      if (!session.roster_student_ids.includes(s.id)) return null // not a member on this date
+      const status = session.attendance.find((a) => a.student_id === s.id)?.status
+      return status ?? 'unmarked'
+    }),
+  }))
+
+  const STATUS_DOT_CLASS: Record<string, string> = {
+    present: 'bg-status-present',
+    late: 'bg-status-late',
+    absent: 'bg-status-absent',
+    excused: 'bg-status-excused',
+    unmarked: 'bg-status-unmarked',
+  }
+
+  function classicExportRows() {
+    return classicRows.map((r) => {
+      const row: Record<string, string> = { [t('attendance.nameColumn')]: r.name }
+      heldSessions.forEach((s, i) => {
+        const cell = r.cells[i]
+        row[s.date] = cell === null ? '' : t(`statuses.${cell}` as never)
+      })
+      return row
+    })
+  }
+
   function handleExport(format: 'csv' | 'xlsx') {
     const filename = `attendance-share-${from}-${to}.${format}`
-    if (activeTab === 'bySession') exportRows(sessionRows, filename, format)
+    if (activeTab === 'classic') exportRows(classicExportRows(), filename, format)
+    else if (activeTab === 'bySession') exportRows(sessionRows, filename, format)
     else exportRows(studentRows, filename, format)
   }
 
+  const ensembleLabel = data.scope === 'single_ensemble' ? data.ensembles[0]?.name : t('manage.allEnsembles')
+
   return (
-    <div className="min-h-dvh bg-stage px-5 pb-16 pt-6">
+    <div className="min-h-dvh overflow-x-hidden bg-stage px-4 pb-16 pt-6 sm:px-5">
       <div className="mx-auto max-w-6xl space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <Logo className="h-8 w-auto" title={t('app.name')} />
           <OptionRow
             options={[
@@ -128,12 +165,24 @@ export default function SharePage() {
           />
         </div>
 
+        <div>
+          <p className="text-[15.5px] tracking-[-.005em] text-score">
+            {t('share.attendanceTitle')} — {ensembleLabel}
+          </p>
+          {data.owner_email && (
+            <p className="mt-[3px] text-[11.5px] text-faint">
+              {t('share.sharedBy')} {data.owner_email}
+            </p>
+          )}
+        </div>
+
         {data.truncated && <p className="font-alt text-[11.5px] tracking-[.1em] text-faint">{t('share.truncated')}</p>}
 
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-ui text-[12.5px] font-light">
           {data.scope === 'all' && (
             <Select value={ensembleId ?? '__all__'} onValueChange={(v) => setEnsembleId(v === '__all__' ? undefined : v)}>
               <SelectTrigger className={FILTER_TRIGGER_CLASS}>
+                <ListFilter className="size-3.5 text-faint" strokeWidth={1.4} />
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -148,6 +197,7 @@ export default function SharePage() {
           )}
           <Select value={kind ?? '__all__'} onValueChange={(v) => setKind(v === '__all__' ? undefined : v)}>
             <SelectTrigger className={FILTER_TRIGGER_CLASS}>
+              <ListFilter className="size-3.5 text-faint" strokeWidth={1.4} />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -160,6 +210,7 @@ export default function SharePage() {
             </SelectContent>
           </Select>
           <div className="flex items-center gap-1.5 text-dim">
+            <CalendarDays className="size-3.5 text-faint" strokeWidth={1.4} />
             <input
               type="date"
               value={from}
@@ -175,10 +226,20 @@ export default function SharePage() {
             />
           </div>
           <div className="ms-auto flex items-center gap-4">
-            <button type="button" onClick={() => handleExport('csv')} className="text-dim transition-colors hover:text-lamp">
+            <button
+              type="button"
+              onClick={() => handleExport('csv')}
+              className="inline-flex items-center gap-1.5 text-dim transition-colors hover:text-lamp"
+            >
+              <Download className="size-3.5" strokeWidth={1.4} />
               {t('history.exportCsv')}
             </button>
-            <button type="button" onClick={() => handleExport('xlsx')} className="text-dim transition-colors hover:text-lamp">
+            <button
+              type="button"
+              onClick={() => handleExport('xlsx')}
+              className="inline-flex items-center gap-1.5 text-dim transition-colors hover:text-lamp"
+            >
+              <Download className="size-3.5" strokeWidth={1.4} />
               {t('history.exportExcel')}
             </button>
           </div>
@@ -186,28 +247,73 @@ export default function SharePage() {
 
         <OptionRow
           options={[
-            { value: 'bySession' as const, label: t('history.bySession') },
-            { value: 'byStudent' as const, label: t('history.byStudent') },
+            { value: 'classic' as const, label: t('share.viewClassic') },
+            { value: 'bySession' as const, label: t('share.viewBySession') },
+            { value: 'byStudent' as const, label: t('share.viewByStudent') },
           ]}
           value={activeTab}
           onChange={setActiveTab}
         />
+
+        {activeTab === 'classic' && (
+          <div className="space-y-3">
+            <p className="text-[11.5px] text-faint">{t('share.classicHint')}</p>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t('attendance.nameColumn')}</TableHead>
+                  {heldSessions.map((s) => (
+                    <TableHead key={s.id} className="whitespace-nowrap text-center">
+                      {s.date.slice(5).split('-').reverse().join('.')}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {classicRows.map((r, i) => (
+                  <TableRow key={i}>
+                    <TableCell className="whitespace-nowrap">{r.name}</TableCell>
+                    {r.cells.map((cell, j) => (
+                      <TableCell key={j} className="text-center">
+                        {cell !== null && (
+                          <span
+                            className={cn('inline-block size-2.5 rounded-full', STATUS_DOT_CLASS[cell])}
+                            title={t(`statuses.${cell}` as never)}
+                            aria-label={t(`statuses.${cell}` as never)}
+                          />
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11.5px] text-faint">
+              {(['present', 'late', 'absent', 'excused', 'unmarked'] as const).map((st) => (
+                <span key={st} className="inline-flex items-center gap-1.5">
+                  <span className={cn('inline-block size-2.5 rounded-full', STATUS_DOT_CLASS[st])} />
+                  {t(`statuses.${st}` as never)}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         {activeTab === 'bySession' && (
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>{t('attendance.date')}</TableHead>
-                <TableHead>Kind</TableHead>
-                <TableHead>Title</TableHead>
-                <TableHead>Ensembles</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>P</TableHead>
-                <TableHead>A</TableHead>
-                <TableHead>L</TableHead>
-                <TableHead>E</TableHead>
-                <TableHead>?</TableHead>
-                <TableHead>%</TableHead>
+                <TableHead>{t('share.kindColumn')}</TableHead>
+                <TableHead>{t('session.title')}</TableHead>
+                <TableHead>{t('session.ensembles')}</TableHead>
+                <TableHead>{t('share.statusColumn')}</TableHead>
+                <TableHead>{t('share.presentColumn')}</TableHead>
+                <TableHead>{t('share.absentColumn')}</TableHead>
+                <TableHead>{t('share.lateColumn')}</TableHead>
+                <TableHead>{t('share.excusedColumn')}</TableHead>
+                <TableHead>{t('share.unmarkedColumn')}</TableHead>
+                <TableHead>{t('share.percentColumn')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -233,11 +339,11 @@ export default function SharePage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Instrument</TableHead>
-                <TableHead>Grade</TableHead>
-                <TableHead>Sessions</TableHead>
-                <TableHead>%</TableHead>
+                <TableHead>{t('attendance.nameColumn')}</TableHead>
+                <TableHead>{t('attendance.instrumentColumn')}</TableHead>
+                <TableHead>{t('attendance.gradeColumn')}</TableHead>
+                <TableHead>{t('share.sessionsColumn')}</TableHead>
+                <TableHead>{t('share.percentColumn')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

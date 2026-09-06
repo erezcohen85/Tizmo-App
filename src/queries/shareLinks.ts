@@ -64,3 +64,14 @@ export function useRegenerateShareLink() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['shareLinks'] }),
   })
 }
+
+export function useDeleteShareLink() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('share_links').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['shareLinks'] }),
+  })
+}
